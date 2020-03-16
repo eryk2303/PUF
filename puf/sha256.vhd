@@ -21,7 +21,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
 
-use work.constants_sha256_definition.all;
+use work.sha256_typ.all;
 use work.constants_sha256_definition.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -39,9 +39,9 @@ entity sha256 is
 			
 			word_to_transform : in std_logic_vector(31 downto 0);
 			
-			transformed_word : out std_logic_vector(255 downto 0);
+			transformed_word : out std_logic_vector(255 downto 0)
 
-
+);
 end sha256;
 
 architecture Behavioral of sha256 is
