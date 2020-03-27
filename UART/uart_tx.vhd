@@ -40,8 +40,8 @@ port(
 	Reset			: in std_logic;
 	TX_Data_In	: in std_logic_vector(Width_Data - 1 downto 0);
 	TX_Go			: in std_logic;
-	TX_Start		: out std_logic;
-	Tx				: out std_logic);
+	TX_Start		: out std_logic := '0';
+	Tx				: out std_logic := '1');
 	
 
 end uart_tx;
@@ -51,20 +51,19 @@ architecture Behavioral of uart_tx is
 
 constant max_freq_count	: integer := Clk_Frequenty / Baud;
 signal freq_count : integer range 0 to max_freq_count;
-signal count : integer range 0 to 9;
+signal count : integer range 0 to 10;
+
 
 begin
 
 
-process(Clk, Reset)
+TX_PROCESS: process(Clk, Reset,TX_Go)
 	begin
 		if rising_edge(ClK) then
-			if(Reset = '0') then
-				if(TX_Go = '1') then
-						TX_Start <= '1';
-						if (freq_count < max_freq_count) then
+			if Reset = '0' then
+						if freq_count < max_freq_count then
 							freq_count <= freq_count + 1;
-							if(count = 0) then
+							if count = 0 then
 								Tx <= '0';
 							end if;
 							if(count > 0) then
@@ -73,24 +72,31 @@ process(Clk, Reset)
 									end if;
 							end if;
 								if(count = 9) then
+									TX_Start <= '1';
 									Tx <= '1';
+								else 
+									TX_Start <= '0';
+								end if;
+								
 						else 
 								freq_count <= 0;
-								if(count < 9)then
+								if(count < 10)then
 									count <= count + 1;
-								else
-									count <=0;
-									Tx <= '1';
+								end if;
+								
+								if count = 10 then
+									
+									if TX_Go = '1' then
+										count <=0;
+										freq_count <= 0;
+									end if;
 								end if;
 						end if;
-					end if;
-					else 
-						Tx <= '1';
-				end if;
-				else 
-					Tx <= '1';
 			end if;
 		end if;
 	end process;
+	
+
+	
 end Behavioral;
 

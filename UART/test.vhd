@@ -60,9 +60,10 @@ ARCHITECTURE behavior OF test IS
  	--Outputs
    signal TX_Start : std_logic;
    signal Tx : std_logic;
+	signal new_d : std_logic := '0';
 
    -- Clock period definitions
-   constant Clk_period : time := 10 ns;
+   constant Clk_period : time := 100 ns;
  
 BEGIN
  
@@ -84,19 +85,22 @@ BEGIN
 		Clk <= '1';
 		wait for Clk_period/2;
    end process;
- 
+
 
    -- Stimulus process
-   stim_proc: process
-   begin		
+   stim_proc: process(TX_Start)
+   begin	
+	if TX_Start = '0' then	
 		TX_Go	<= '1';
 		Reset	<= '0';
-		TX_Data_In	<= "11111111";
-		     -- hold reset state for 100 ns.
-     
+		TX_Data_In	<= "01010101";
+	end if;
+	if TX_Start = '1' then
+			TX_Go	<= '0';
+		end if;
 
 
-      wait;
+		
    end process;
 
 END;

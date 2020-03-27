@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -lib "secureip" -o "/home/eryk/Pulpit/UART/test_isim_beh.exe" -prj "/home/eryk/Pulpit/UART/test_beh.prj" "work.test" 
