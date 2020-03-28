@@ -31,7 +31,7 @@ use ieee.numeric_std.all;
 
 entity uart_tx is
 generic(
-		Clk_Frequenty	: INTEGER:= 10000000;
+		Clk_Frequenty	: INTEGER:= 12000000;
 		Width_Data : INTEGER := 8;
 		Baud	: INTEGER := 19200);
 		
@@ -61,37 +61,39 @@ TX_PROCESS: process(Clk, Reset,TX_Go)
 	begin
 		if rising_edge(ClK) then
 			if Reset = '0' then
-						if freq_count < max_freq_count then
-							freq_count <= freq_count + 1;
-							if count = 0 then
-								Tx <= '0';
-							end if;
-							if(count > 0) then
-								if(count < 9) then
-									Tx <= TX_Data_In(count-1);
-									end if;
-							end if;
-								if(count = 9) then
-									TX_Start <= '1';
-									Tx <= '1';
-								else 
-									TX_Start <= '0';
-								end if;
-								
-						else 
-								freq_count <= 0;
-								if(count < 10)then
-									count <= count + 1;
-								end if;
-								
-								if count = 10 then
-									
-									if TX_Go = '1' then
-										count <=0;
-										freq_count <= 0;
-									end if;
-								end if;
+				if freq_count < max_freq_count then
+					freq_count <= freq_count + 1;
+					if count = 0 then
+						Tx <= '0';
+					end if;
+					if count > 0 then
+						if count < 9 then
+							Tx <= TX_Data_In(count - 1);
 						end if;
+					end if;
+					if count = 9 then
+						TX_Start <= '1';
+						Tx <= '1';
+					else 
+						TX_Start <= '0';
+					end if;		
+				else 
+					freq_count <= 0;
+					if count < 10 then
+						count <= count + 1;
+					end if;		
+					if count = 10 then
+						if TX_Go = '1' then
+							count <=0;
+							freq_count <= 0;
+						end if;
+					end if;
+				end if;
+				else 
+					TX_Start <= '1';
+					count <= 0;
+					Tx <= '1';
+					freq_count <= 0;
 			end if;
 		end if;
 	end process;

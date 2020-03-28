@@ -90,14 +90,16 @@ BEGIN
    -- Stimulus process
    stim_proc: process(TX_Start)
    begin	
+	
 	if TX_Start = '0' then	
 		TX_Go	<= '1';
 		Reset	<= '0';
 		TX_Data_In	<= "01010101";
 	end if;
+	
 	if TX_Start = '1' then
 			TX_Go	<= '0';
-		end if;
+	end if;
 
 
 		
