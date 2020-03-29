@@ -1,15 +1,18 @@
-
+--
+--	Package File Template
+--
+--	Purpose: This package defines supplemental types, subtypes, 
+--		 constants, and functions 
+--
+--   To use any of the example code shown below, uncomment the lines and modify as necessary
+--
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use work.sha256_typ.all;
 
+package constants is
 
-package constants_sha256_definition is
-constant constants_initial : function_initial_values := (
-			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19"
-			);
-
+type constants_value_sha256 is array(0 to 63) of std_logic_vector(31 downto 0);
 
 constant constants_value : constants_value_sha256 := (
 			x"428a2f98", x"71374491", x"b5c0fbcf", x"e9b5dba5", x"3956c25b", x"59f111f1", x"923f82a4", x"ab1c5ed5",
@@ -22,8 +25,13 @@ constant constants_value : constants_value_sha256 := (
 			x"748f82ee", x"78a5636f", x"84c87814", x"8cc70208", x"90befffa", x"a4506ceb", x"bef9a3f7", x"c67178f2"
 		);
 
-end constants_sha256_definition;
+type function_initial_values is array(0 to 7) of std_logic_vector(31 downto 0);	
 
-package body constants_sha256_definition is
+constant constants_initial : function_initial_values := (
+			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19");
 
-end constants_sha256_definition;
+type message_block is array(0 to 63) of std_logic_vector(31 downto 0);
+		
+end constants;
+
+
