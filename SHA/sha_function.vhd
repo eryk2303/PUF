@@ -216,9 +216,7 @@ package body sha_function is
                     --! Hash values from the previous iteration
                     signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
                     --! Hash values from the current iteration
-                    signal a, b, c, d, e, f, g, h : inout  std_logic_vector(31 downto 0)
-
-                );
+                    signal a, b, c, d, e, f, g, h : inout  std_logic_vector(31 downto 0)) is 
         begin 
             h0 <= std_logic_vector(unsigned(a) + unsigned(h0));
             h1 <= std_logic_vector(unsigned(b) + unsigned(h1));
