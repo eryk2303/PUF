@@ -1,51 +1,43 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+--! Engineer: EW, JP 
 -- 
--- Create Date:    10:50:02 03/28/2020 
--- Design Name: 
--- Module Name:    sha_tx - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
+--! Create Date:    10:50:02 03/28/2020 
+--! Design Name: sha_tx
+--! Module Name:    sha_tx - Behavioral 
+--! Project Name: SHA256
+--!  @brief dividing the final sha result by eight bits and calling uart
 --
 ----------------------------------------------------------------------------------
+
+--! Use standart library 
 library IEEE;
+--! use logic elements
 use IEEE.STD_LOGIC_1164.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
+--! dividing the final sha result by eight bits and calling uart
 entity sha_tx is
 generic(
+	--! message sha length
 		Width_Data_Sha : INTEGER := 256;
+	--! message uart length
 		Width_Data_Uart : INTEGER := 8);
 		
 port(
 	Clk_Sha_Uart		: in std_logic;
 	Reset_Sha_Uart		: in std_logic;
-	New_Data				: in std_logic;
+	--! value to set when new data is coming
+	New_Data			: in std_logic;
+	--! sha data
 	Data_In				: in std_logic_vector(Width_Data_Sha - 1 downto 0);
-	Finish_Transmit	: out std_logic := '1');
+	--! value to set when transmit is end 
+	Finish_Transmit		: out std_logic := '1');
 
 end sha_tx;
+--! dividing the final sha result by eight bits and calling uart
 
 architecture Behavioral of sha_tx is
-
+	--! declaration uart_tx component 
     component uart_tx
     port(
          Clk 			: in  std_logic;
@@ -70,6 +62,7 @@ architecture Behavioral of sha_tx is
 	
 	signal new_d : std_logic := '0';
 
+	--! count to set when next uart packet should start 
 	signal count : integer range 1 to 33 := 33;
 
 begin

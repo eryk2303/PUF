@@ -1,46 +1,37 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date:    18:27:11 03/26/2020 
--- Design Name: 
--- Module Name:    uart_tx - Behavioral 
--- Project Name: 
--- Target Devices: 
--- Tool versions: 
--- Description: 
---
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Additional Comments: 
---
+-- Engineer: EW, JP
+--! Create Date:    18:27:11 03/26/2020  
+--! Module Name:    uart_tx - Behavioral 
+--! Project Name: SHA256
+--! @brief Definition UART TX
 ----------------------------------------------------------------------------------
+
+--! Use standart library 
 library IEEE;
+--! use logic elements
 use IEEE.STD_LOGIC_1164.ALL;
+--! use numeric elements
 use ieee.numeric_std.all;
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
+--! Definition UART TX
 entity uart_tx is
 generic(
 		Clk_Frequenty	: INTEGER:= 12000000;
+		--! message uart length
 		Width_Data : INTEGER := 8;
+		--! Baud UART definition
 		Baud	: INTEGER := 19200);
 		
 port(
 	Clk			: in std_logic;
 	Reset			: in std_logic;
+	--! data to transmit
 	TX_Data_In	: in std_logic_vector(Width_Data - 1 downto 0);
+	--! definition when new data come
 	TX_Go			: in std_logic;
+	--! definition when new data can come
 	TX_Start		: out std_logic := '0';
+	--! Tx pin transmit 
 	Tx				: out std_logic := '1');
 	
 
@@ -48,9 +39,11 @@ end uart_tx;
 
 architecture Behavioral of uart_tx is
 
-
+--!  what freq count should have value to have right value of frequency
 constant max_freq_count	: integer := Clk_Frequenty / Baud;
+--! counts how long the byte is transmitted
 signal freq_count : integer range 0 to max_freq_count;
+--! count to set when next byte should start 
 signal count : integer range 0 to 10;
 
 
