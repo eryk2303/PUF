@@ -44,10 +44,11 @@ function code_a(h, e, f, g, a, b, c, M, K : std_logic_vector) return std_logic_v
 function code_M(
                 --! expanded message blocks
                 constant data :  	message_block;
+                --! input word
+                constant word_input : in std_logic_vector(31 downto 0);
                 --! number of iteration 
                 constant iterator :  std_logic_vector(5 downto 0)) return std_logic_vector;
-
-
+ 
 --! compression function for current iteration
 procedure transform(
                     --! Hash values from the previous iteration
@@ -151,17 +152,19 @@ package body sha_function is
 
     function code_M(
                 constant data 	:  message_block;
+                constant word_input : in std_logic_vector(31 downto 0);
                 constant iterator :  std_logic_vector(5 downto 0)) return std_logic_vector 
+                
 
     is
         variable i : integer := to_integer(unsigned(iterator));
     begin 
 
         if i < 16 then
-            return std_logic_vector(shift_left(unsigned(data(i)), 24) xor 
-												shift_left(unsigned(data(i + 1)), 16) xor 
-												shift_left(unsigned(data(i + 2)), 8) xor unsigned(data(i + 3)));
-
+           -- return std_logic_vector(shift_left(unsigned(data(i)), 24) xor 
+			--									shift_left(unsigned(data(i + 1)), 16) xor 
+			--									shift_left(unsigned(data(i + 2)), 8) xor unsigned(data(i + 3)));
+            return word_input;
         else
             return std_logic_vector(unsigned(SIG1(data(i - 2))) + unsigned(data(i - 7)) + unsigned(SIG0(data(i - 15))) + unsigned(data(i - 16)));
         end if;
