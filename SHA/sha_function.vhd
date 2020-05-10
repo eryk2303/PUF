@@ -40,6 +40,10 @@ function code_e(h, e, f, g, d, M, K : std_logic_vector) return std_logic_vector;
 --! Function with calculatete temporary values used to code value
 function code_a(h, e, f, g, a, b, c, M, K : std_logic_vector) return std_logic_vector;
 
+--function T1(h, e, f, g, K, W : std_logic_vector) return std_logic_vector;
+--
+--function T2(a, b, c : std_logic_vector) return std_logic_vector;
+
 --! Function with calculatete temporary values used to code value
 function code_M(
                 --! expanded message blocks
@@ -62,14 +66,13 @@ procedure transform(
 
                     
 --! add previous and currend value 
-procedure adding(
-                    --! Hash values from the previous iteration
-                    signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
-                    --! Hash values from the current iteration
-                    signal a, b, c, d, e, f, g, h : inout  std_logic_vector(31 downto 0)
-
-                );
-
+ procedure adding(
+					  --! Hash values from the previous iteration
+					  signal h : inout  hash_array;
+					  --! Hash values from the current iteration
+					  signal w_v : in  hash_array
+					  
+					  );
 
 
 end sha_function;
@@ -217,18 +220,18 @@ package body sha_function is
 
     procedure adding(
                     --! Hash values from the previous iteration
-                    signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
+                    signal h : inout  hash_array;
                     --! Hash values from the current iteration
-                    signal a, b, c, d, e, f, g, h : inout  std_logic_vector(31 downto 0)) is 
+                    signal w_v : in  hash_array) is 
         begin 
-            h0 <= std_logic_vector(unsigned(a) + unsigned(h0));
-            h1 <= std_logic_vector(unsigned(b) + unsigned(h1));
-            h2 <= std_logic_vector(unsigned(c) + unsigned(h2));
-            h3 <= std_logic_vector(unsigned(d) + unsigned(h3));
-            h4 <= std_logic_vector(unsigned(e) + unsigned(h4));
-            h5 <= std_logic_vector(unsigned(f) + unsigned(h5));
-            h6 <= std_logic_vector(unsigned(g) + unsigned(h6));
-            h7 <= std_logic_vector(unsigned(h) + unsigned(h7));
+            h(0) <= std_logic_vector(unsigned(w_v(0)) + unsigned(h(0)));
+            h(1) <= std_logic_vector(unsigned(w_v(1)) + unsigned(h(1)));
+            h(2) <= std_logic_vector(unsigned(w_v(2)) + unsigned(h(2)));
+            h(3) <= std_logic_vector(unsigned(w_v(3)) + unsigned(h(3)));
+            h(4) <= std_logic_vector(unsigned(w_v(4)) + unsigned(h(4)));
+            h(5) <= std_logic_vector(unsigned(w_v(5)) + unsigned(h(5)));
+            h(6) <= std_logic_vector(unsigned(w_v(6)) + unsigned(h(6)));
+            h(7) <= std_logic_vector(unsigned(w_v(7)) + unsigned(h(7)));
 
     end procedure;
 end sha_function;
