@@ -10,8 +10,8 @@ entity WORD_T is
 		clk 		: in std_logic;
 		
 		word_in 	: in DWORD;
-		i 			: in integer;
-		schedule : inout message_schedule;
+		iterator	: in natural;
+		sched_in : inout message_schedule;
 		
 		ack 		: out integer
 	);
@@ -21,15 +21,22 @@ architecture Behavioral of WORD_T is
 begin
 
 	process(clk) is
+		variable schedule : message_schedule;
 	begin
-	
-		if i < 16 then
-			schedule(i) <= word_in;
-		elsif i < 64 then
-			schedule(i) <= std_logic_vector(unsigned(SIG1(schedule(i - 2))) + unsigned(schedule(i - 7)) + unsigned(SIG0(schedule(i - 15))) + unsigned(schedule(i - 16)));
+		schedule := sched_in;
+		
+		if iterator < 15 then
+			schedule(iterator) := word_in;
+			ack <= iterator;
+		elsif iterator < 64 then
+			schedule(iterator) := word_in;
+			for i in iterator + 1 to 63 loop
+				schedule(i) := std_logic_vector(unsigned(SIG1(schedule(i - 2))) + unsigned(schedule(i - 7)) + unsigned(SIG0(schedule(i - 15))) + unsigned(schedule(i - 16)));
+				ack <= i;
+			end loop;
 		end if;
 		
-		ack <= i;
+		sched_in <= schedule;
 			
 	end process;
 

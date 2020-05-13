@@ -14,6 +14,7 @@ entity COMPUTE_HASH is
 		word_nr 			: out integer;
 
 		hash_output 	: out hash_array;
+		hash_ready		: out std_logic := '0';
 
 		reset 			: in std_logic
 	);
@@ -34,9 +35,6 @@ architecture Behavioral of COMPUTE_HASH is
 	signal 	hash 	: hash_array := constants_initial;
 	signal 	i 		: integer := 0;
 
-	-- temporary for tests
---	signal 	clk 	: std_logic := '0';
-
 begin
 
 	GET_WORD : process(clk) is
@@ -51,8 +49,8 @@ begin
 
 	begin
 
-		if (word_input_nr = i) and (reset = '0') then
-			if i < 63 then
+		if (reset = '0') then
+			if (word_input_nr = i) and i < 63 then
 				K := constants_value(i);
 				W := word_input;
 				h <= g;
@@ -68,8 +66,8 @@ begin
 			else
 				i <= 0;
 				adding(hash, working_vars);
-				hash_output <= hash;
 			end if;
+			hash_output <= hash;
 		elsif (reset = '1') then
 			initiation(a, b, c, d, e, f, g, h);
 			i <= 0;
@@ -77,7 +75,6 @@ begin
 
 	end process;
 	
---	clk <= not clk after 100 ns;
 	
 end Behavioral;
 
