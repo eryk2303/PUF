@@ -7,12 +7,14 @@ use work.constants.all;
 
 entity COMPUTE_HASH is
 	port(
-		clk 			: in std_logic;
+		clk 				: in std_logic;
+		
+		--! input interface
+		word_input 		: in  DWORD;
+		word_in_nr	 	: in  natural range 0 to 64;
+		word_req_id 	: out natural range 0 to 63;
 
-		word_input 		: in DWORD;
-		word_input_nr 	: in integer;
-		word_nr 			: out integer;
-
+		--! output interface
 		hash_output 	: out hash_array;
 		hash_ready		: out std_logic := '0';
 
@@ -22,6 +24,7 @@ end COMPUTE_HASH;
 
 architecture Behavioral of COMPUTE_HASH is
 
+	--! working variables used in computation
 	signal working_vars : hash_array := constants_initial;
 	alias a	: DWORD is working_vars(0);
 	alias b	: DWORD is working_vars(1);
@@ -32,26 +35,27 @@ architecture Behavioral of COMPUTE_HASH is
 	alias g	: DWORD is working_vars(6);
 	alias h	: DWORD is working_vars(7);
 	
-	signal 	hash 	: hash_array := constants_initial;
-	signal 	i 		: integer := 0;
+	--! a working variable for computing hash
+	signal hash : hash_array := constants_initial;
 
 begin
 
-	GET_WORD : process(clk) is
-	begin
-		word_nr <= i;
-	end process;
-
-	MAIN_LOOP : process(clk, reset) is
+	process(clk, reset) is
 
 		variable K : DWORD;
 		variable W : DWORD;
+		
+		variable iter : integer := 0;
 
 	begin
+	
+		if reset = '0' then
+		
+			--! checks if requested word is on input
+			if word_in_nr = (iter + 1) then
+				hash_ready	<= '0';
 
-		if (reset = '0') then
-			if (word_input_nr = i) and i < 63 then
-				K := constants_value(i);
+				K := constants_value(iter);
 				W := word_input;
 				h <= g;
 				g <= f;
@@ -62,15 +66,23 @@ begin
 				b <= a;
 				a <= code_a(h, e, f, g, a, b, c, W, K);
 				
-				i <= i + 1;
-			else
-				i <= 0;
-				adding(hash, working_vars);
+				iter := iter + 1;
+				
+				if iter = 64 then
+					iter := 0;
+					adding(hash, working_vars);
+					
+					hash_output <= hash;
+					hash_ready	<= '1';
+				end if;
 			end if;
-			hash_output <= hash;
-		elsif (reset = '1') then
+			
+			--! reqest for next word
+			word_req_id <= iter;
+
+		elsif reset = '1' then
 			initiation(a, b, c, d, e, f, g, h);
-			i <= 0;
+			iter := 0;
 		end if;
 
 	end process;

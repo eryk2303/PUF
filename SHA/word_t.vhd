@@ -9,36 +9,57 @@ entity WORD_T is
 	port(
 		clk 		: in std_logic;
 		
+		--! input data
 		word_in 	: in DWORD;
-		iterator	: in natural;
-		sched_in : inout message_schedule;
+		iter		: in natural;
+		ready		: in std_logic;
 		
-		ack 		: out integer
+		schedule : inout message_schedule;
+		
+		--! counts ready words, 0 words ready in schedule at the beginning
+		ack 		: out integer range 0 to 64 := 0;
+		
+		reset		: in std_logic
 	);
 end WORD_T;
 
 architecture Behavioral of WORD_T is
 begin
 
-	process(clk) is
-		variable schedule : message_schedule;
+	process(clk, reset) is
+		variable data : message_schedule;
 	begin
-		schedule := sched_in;
 		
-		if iterator < 15 then
-			schedule(iterator) := word_in;
-			ack <= iterator;
-		elsif iterator < 64 then
-			schedule(iterator) := word_in;
-			for i in iterator + 1 to 63 loop
-				schedule(i) := std_logic_vector(unsigned(SIG1(schedule(i - 2))) + unsigned(schedule(i - 7)) + unsigned(SIG0(schedule(i - 15))) + unsigned(schedule(i - 16)));
-				ack <= i;
-			end loop;
+		if ready = '1' and reset = '0' then
+			--! variable used for changing it's content every loop inside 'for'
+			data := schedule;
+			
+			--! condition from 0 to 14
+			if iter < 15 then
+				data(iter) 	:= word_in;
+				ack 			<= iter + 1;
+			
+			--! condition for last input word and then it calculates final words
+			elsif iter = 15 then
+				--! assignment of the last input word
+				data(iter) 	:= word_in;
+				
+				for i in iter + 1 to 63 loop
+					data(i) 	:= std_logic_vector(unsigned(SIG1(data(i - 2))) + unsigned(data(i - 7)) + unsigned(SIG0(data(i - 15))) + unsigned(data(i - 16)));
+					--! on the last iteration it will assign '64' integer as it is meant to behave like a counter (64 words written in schedule)
+					ack 		<= i + 1;
+				end loop;
+			end if;
+			
+			schedule <= data;
+			
+		elsif reset = '1' then
+			ack <= 0;
+			
 		end if;
-		
-		sched_in <= schedule;
 			
 	end process;
+	
 
 end Behavioral;
 

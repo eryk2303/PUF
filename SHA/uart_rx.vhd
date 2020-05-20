@@ -49,30 +49,31 @@ begin
 	RX_PROCESS : process(Clk, Reset) is
 	begin
 
-		if (Reset = '1') then
+		if Reset = '1' then
 			last_Rx 	<= '0';
 			receiving 	<= '0';
 			data_buf 	<= (others => '0');
 			data_ready 	<= '0';
 
-		elsif (rising_edge(Clk) and Reset = '0') then
+		elsif rising_edge(Clk) and Reset = '0' then
 
 			last_Rx <= Rx;
 
-			if (receiving = '0') then
-				if (last_Rx = '1' and Rx = '0') then
+			if receiving = '0' then
+				--! checking for starting bit
+				if last_Rx = '1' and Rx = '0' then
 					receiving 	<= '1';
 					freq_count 	<= 1;
 					count 		<= 0;
 				end if;
-				data_ready <= '0';
+				data_ready 		<= '0';
 
-			elsif (receiving = '1') then
+			elsif receiving = '1' then
 				
-				if (freq_count < max_freq_count-1) then
+				if freq_count < (max_freq_count - 1) then
 					freq_count <= freq_count + 1;
 
-					if (freq_count = max_freq_count/2) then
+					if freq_count = (max_freq_count / 2) then
 						data_buf(count) <= Rx;
 					end if;
 
@@ -80,7 +81,7 @@ begin
 					freq_count <= 0;
 
 					if (count < Data_Width) then
-						count <= count + 1;
+						count 		<= count + 1;
 					elsif (count = Data_Width) then
 						receiving 	<= '0';
 						count 		<= 0;
