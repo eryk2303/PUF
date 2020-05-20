@@ -20,7 +20,7 @@ entity PADDING_MESSAGE is
 		
 		--! output interface
 		word_output		: out DWORD;
-		word_nr			: out natural range 0 to 15;
+		word_id			: out natural range 0 to 15;
 		word_ready		: out std_logic;
 	
 		reset				: in std_logic
@@ -84,14 +84,14 @@ begin
 							--! when input data entirely fits to the end of the buffer
 							elsif (ptr_b - input_length) = 0 then
 								word_output 	<= word_buffer(31 downto ptr_b) & input_DATA(DATA_WIDTH-1 downto DATA_WIDTH-input_length);
-								word_nr 			<= word_counter;
+								word_id 			<= word_counter;
 								word_ready 		<= '1';
 								word_counter 	<= (word_counter + 1) mod 16;
 								ptr_b 			:= 32;
 							--! when input data ovefills the buffer
 							else
 								word_output 	<= word_buffer(31 downto ptr_b) & input_DATA(DATA_WIDTH-1 downto DATA_WIDTH-ptr_b);
-								word_nr 			<= word_counter;
+								word_id 			<= word_counter;
 								word_ready 		<= '1';
 								word_counter 	<= (word_counter + 1) mod 16;
 								word_buffer(31 downto 32-input_length+ptr_b) <= input_DATA(DATA_WIDTH-ptr_b-1 downto DATA_WIDTH-input_length);
@@ -139,7 +139,7 @@ begin
 								
 							end if;
 							
-							word_nr 			<= word_counter;
+							word_id 			<= word_counter;
 							word_ready 		<= '1';
 							word_counter 	<= (word_counter + 1) mod 16;
 							

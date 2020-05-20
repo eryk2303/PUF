@@ -32,7 +32,7 @@ architecture Behavioral of MAIN is
 	signal UC_Output_finish : std_logic;
 
 	signal S1_Word_output	: DWORD;
-	signal S1_Word_nr		: natural range 0 to 15;
+	signal S1_Word_id		: natural range 0 to 15;
 	signal S1_Word_ready	: std_logic;
 
 	
@@ -81,7 +81,7 @@ begin
 			input_ready 	=> UC_Output_ready,
 			input_finish 	=> UC_Output_finish,
 			word_output		=> S1_Word_output,
-			word_nr			=> S1_Word_nr,
+			word_id			=> S1_Word_id,
 			word_ready		=> S1_Word_ready,
 			reset			=> Reset
 		);	
@@ -91,7 +91,7 @@ begin
 		port map(
 			clk 			=> Clk,
 			word_input		=> S1_Word_output,
-			word_in_id		=> S1_Word_nr,
+			word_in_id		=> S1_Word_id,
 			word_in_ready	=> S1_Word_ready,
 			word_output		=> S2_Word_output,
 			word_out_nr		=> S2_Word_out_nr,
