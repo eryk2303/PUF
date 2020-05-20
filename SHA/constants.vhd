@@ -13,8 +13,11 @@ use IEEE.STD_LOGIC_1164.all;
 --! Packet with definition new type of value and constants variable 
 package constants is
 
+--! Definition type of 32-bit word
+subtype DWORD is std_logic_vector(31 downto 0);
+
 --! Definition type for storing the constants array 
-type constants_value_sha256 is array(0 to 63) of std_logic_vector(31 downto 0);
+type constants_value_sha256 is array(0 to 63) of DWORD;
 
 --! Array of constants value used in sha algoritm
 constant constants_value : constants_value_sha256 := (
@@ -29,16 +32,18 @@ constant constants_value : constants_value_sha256 := (
 		);
 
 --! Definition type for constants initial hash values
-type function_initial_values is array(0 to 7) of std_logic_vector(31 downto 0);	
+type hash_array is array(0 to 7) of DWORD;	
 
 
 --! Initial hash values
-constant constants_initial : function_initial_values := (
+constant constants_initial : hash_array := (
 			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19");
 
 
---! Definition type for storing the array with expanded message blocks
-type message_block is array(0 to 63) of std_logic_vector(31 downto 0);
+--! Definition type for storing the array of 32-bit words
+type message_block is array(0 to 15) of DWORD;
+
+type message_schedule is array (0 to 63) of DWORD;
 		
 end constants;
 
