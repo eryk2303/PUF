@@ -31,18 +31,10 @@ function SIG0(x : std_logic_vector) return std_logic_vector;
 --! function used because of lack unicode support
 function SIG1(x : std_logic_vector) return std_logic_vector;
 
---! Implement hash values to their initial values
-procedure initiation(signal h0, h1, h2, h3, h4, h5, h6, h7 : out std_logic_vector);
-
-
 --! Function with calculatete temporary values used to code value
 function code_e(h, e, f, g, d, M, K : std_logic_vector) return std_logic_vector;
 --! Function with calculatete temporary values used to code value
 function code_a(h, e, f, g, a, b, c, M, K : std_logic_vector) return std_logic_vector;
-
---function T1(h, e, f, g, K, W : std_logic_vector) return std_logic_vector;
---
---function T2(a, b, c : std_logic_vector) return std_logic_vector;
 
 --! Function with calculatete temporary values used to code value
 function code_M(
@@ -51,28 +43,26 @@ function code_M(
                 --! input word
                 constant word_input : in std_logic_vector(31 downto 0);
                 --! number of iteration 
-                constant iterator :  std_logic_vector(5 downto 0)) return std_logic_vector;
+                constant iterator :  std_logic_vector(5 downto 0)
+                ) return std_logic_vector;
  
 --! compression function for current iteration
 procedure transform(
-                    --! Hash values from the previous iteration
-                    signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
-                    --! Expanded message block value for current intertion 
-                    constant M : in std_logic_vector(31 downto 0);
-                    --! constants_value for current intertion 
-                    constant K : in std_logic_vector(31 downto 0)
+                --! Hash values from the previous iteration
+                signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
+                --! Expanded message block value for current intertion 
+                constant M : in std_logic_vector(31 downto 0);
+                --! constants_value for current intertion 
+                constant K : in std_logic_vector(31 downto 0)
+                );
                     
-                    );
-
-                    
---! add previous and currend value 
+--! add previous and current value 
  procedure adding(
-					  --! Hash values from the previous iteration
-					  signal h : inout  hash_array;
-					  --! Hash values from the current iteration
-					  signal w_v : in  hash_array
-					  
-					  );
+                --! Hash values from the previous iteration
+                signal h : inout  hash_array;
+                --! Hash values from the current iteration
+                signal w_v : in  hash_array
+                );
 
 
 end sha_function;
@@ -117,21 +107,7 @@ package body sha_function is
         
             return std_logic_vector(rotate_right(unsigned(x), 17) xor rotate_right(unsigned(x), 19) xor shift_right(unsigned(x), 10));
     end function SIG1;
-    
 
-
-    procedure initiation(signal h0, h1, h2, h3, h4, h5, h6, h7 : out std_logic_vector) is 
-    begin 
-        h0 <= constants_initial(0);
-        h1 <= constants_initial(1);
-        h2 <= constants_initial(2);
-        h3 <= constants_initial(3);
-        h4 <= constants_initial(4);
-        h5 <= constants_initial(5);
-        h6 <= constants_initial(6);
-        h7 <= constants_initial(7);
-
-    end procedure initiation;
 
     function code_e(h, e, f, g, d, M, K : std_logic_vector) return std_logic_vector is 
 

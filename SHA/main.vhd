@@ -54,10 +54,10 @@ architecture Behavioral of MAIN is
 	
 begin
 
-	Rx		<= Clk_input;
-	Tx		<= Rx_input;
-	Clk	<= Tx_input;
-	Reset	<= Reset_input;
+	Clk	<= Clk_input(0);
+	Rx		<= Rx_input(0);
+	Reset	<= Reset_input(0);
+	Tx_input(0)		<= Tx;
 
 	U1 : entity work.uart_rx
 		port map(
@@ -123,11 +123,10 @@ begin
 
 	U2 : entity work.sha_tx	
 		port map(
-			Clk_Sha_Uart	=> Clk,
-			Reset_Sha_Uart	=> Reset,
-			New_Data			=> Hash_ready,
-			Data_In			=> hash_array, -- data type conflict
-			Finish_Transmit=> Finish_Transmit
+			Clk				=> Clk,
+			Reset			=> Reset,
+			Hash_ready		=> Hash_ready,
+			Hash_input		=> Hash
 		);
 
 end Behavioral;

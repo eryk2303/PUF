@@ -24,7 +24,7 @@ entity uart_commander is
 		output_DATA 	: out std_logic_vector(DATA_WIDTH-1 downto 0);
 		output_length 	: out positive range 1 to DATA_WIDTH;
 		output_ready 	: out std_logic := '0';
-		output_finish 	: out std_logic := '0';
+		output_finish 	: inout std_logic := '0';
 		
 		--! calculated hash to transmit
 		hash_input		: in hash_array;
@@ -50,16 +50,21 @@ begin
 		--! stores the length of incoming data, downcounted
 		variable counter 		: natural range 0 to 512;
 		--! buffer for storing last 8 bytes in WAITING state
-		variable data_buffer : std_logic_vector(63 downto 0);
+		variable data_buffer : std_logic_vector(63 downto 0) := (others => '0');
 		--! temporary buffer for decoded string
 		variable command 		: string(8 downto 1);
 	begin
 
-		if rising_edge(clk) and reset = '0' then
+		if reset = '0' then
+			
+			if f_reset = '1' then
+				reset_all 	<= '0';
+				f_reset 		<= '0';
+			end if;
+				
 			if RX_Ready = '0' then
 				f_ready 			<= '0';
 				output_ready 	<= '0';
-				
 				
 			elsif RX_Ready = '1' and f_ready='0' then
 				f_ready 			<= '1';
@@ -95,7 +100,7 @@ begin
 										reset_all 		<= '1';
 										output_finish 	<= '0';
 										output_ready	<= '0';
-										data_buffer		<= (others => '0');
+										data_buffer		:= (others => '0');
 										counter			:= 0;
 																	
 									when others => null;
@@ -122,23 +127,21 @@ begin
 				end case;
 			end if;
 			
-			if f_reset = '1' then
-				reset_all 	<= '0';
-				f_reset 		<= '0';
-			end if;
-			
 		elsif reset = '1' then
 			f_reset 			<= '1';
 			reset_all 		<= '1';
 			output_finish 	<= '0';
 			output_ready	<= '0';
-			data_buffer		<= (others => '0');
+			data_buffer		:= (others => '0');
 			counter			:= 0;
 		end if;
 	end process;
 	
 	TX_COMMANDER : process(clk) is
 	begin
+		if output_finish = '1' and hash_ready = '1' then
+			null;
+		end if;
 	end process;
 
 

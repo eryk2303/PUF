@@ -44,18 +44,24 @@ begin
 		
 	--! handling COMPUTE_HASH requests
 	OUTPUT : process(clk) is
+		variable lock : std_logic := '0';
 	begin
 		
 		--! checks if requested word is already in the schedule
-		if word_req_id < ack then
+		if word_req_id < ack and lock = '0' then
 			word_output 	<= schedule(word_req_id);
-			word_out_nr 	<= word_req_id;
+			word_out_nr 	<= word_req_id + 1;
 			--! locks next requests
 			if word_req_id = 63 then
-				ack <= 0;
+				lock 				:= '1';
 			end if;
 		elsif ack = 0 or reset = '1' then
+			lock 				:= '0';
 			word_out_nr		<= 0;
+		end if;
+		
+		if ack = 1 then
+			lock := '0';
 		end if;
 		
 	end process;

@@ -36,7 +36,10 @@ architecture Behavioral of COMPUTE_HASH is
 	alias h	: DWORD is working_vars(7);
 	
 	--! a working variable for computing hash
-	signal hash : hash_array := constants_initial;
+	signal hash 	: hash_array := constants_initial;
+	
+	type HASH_STATE is (COMPUTE, ADD, INITIALIZE);
+	signal state 	: HASH_STATE := COMPUTE;
 
 begin
 
@@ -45,43 +48,57 @@ begin
 		variable K : DWORD;
 		variable W : DWORD;
 		
-		variable iter : integer := 0;
+		variable iter 	: natural := 0;
 
 	begin
 	
 		if reset = '0' then
 		
+			case state is
+				
+				when COMPUTE =>
 			--! checks if requested word is on input
-			if word_in_nr = (iter + 1) then
-				hash_ready	<= '0';
+					if word_in_nr = (iter + 1) then
 
-				K := constants_value(iter);
-				W := word_input;
-				h <= g;
-				g <= f;
-				f <= e;
-				e <= code_e(h, e, f, g, d, W, K);
-				d <= c;
-				c <= b;
-				b <= a;
-				a <= code_a(h, e, f, g, a, b, c, W, K);
-				
-				iter := iter + 1;
-				
-				if iter = 64 then
-					iter := 0;
-					adding(hash, working_vars);
+					hash_ready	<= '0';
+
+					K := constants_value(iter);
+					W := word_input;
+					h <= g;
+					g <= f;
+					f <= e;
+					e <= code_e(h, e, f, g, d, W, K);
+					d <= c;
+					c <= b;
+					b <= a;
+					a <= code_a(h, e, f, g, a, b, c, W, K);
 					
-					hash_output <= hash;
-					hash_ready	<= '1';
+					iter := iter + 1;
+					if iter = 64 then
+						state <= ADD;
+					end if;
 				end if;
-			end if;
+			
+				when ADD =>
+						adding(hash, working_vars);
+						hash_ready	<= '1';
+						state 		<= INITIALIZE;
+				
+				when INITIALIZE =>
+						working_vars <= hash;
+						iter 			:= 0;
+						state 		<= COMPUTE;
+				
+			end case;
+				
+			
 			
 			--! reqest for next word
 			word_req_id <= iter;
+			hash_output <= hash;
 
 		elsif reset = '1' then
-			initiation(a, b, c, d, e, f, g, h);
+			working_vars <= constants_initial;
 			iter := 0;
 		end if;
 
