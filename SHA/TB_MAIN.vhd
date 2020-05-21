@@ -37,8 +37,13 @@ ARCHITECTURE behavior OF testbench IS
 	type UART_STATE_TYPE is (IDLE, START, DATA, STOP);
 	SIGNAL state_uart 	: UART_STATE_TYPE := IDLE;
 	SIGNAL uart_enable 	: std_logic := '0';
-	SIGNAL uart_data 	: std_logic_vector(DATA_WIDTH-1 downto 0);
+	SIGNAL uart_data 		: std_logic_vector(DATA_WIDTH-1 downto 0);
 	SIGNAL uart_counter	: natural range 0 to DATA_WIDTH+3 := 0;
+	
+	
+	SIGNAL TX_Data			: std_logic_vector(DATA_WIDTH-1 downto 0);
+	SIGNAL TX_Ready		: std_logic := '0';
+	SIGNAL Hash_Tx			: std_logic_vector(255 downto 0) := (others => '0');
 
 
 
@@ -215,6 +220,27 @@ BEGIN
 				end if;
 
 			end if;
+	END PROCESS;
+	
+	
+	
+	TX_RECIEVER : entity work.uart_rx
+	port map(
+		Clk 				=> Clk,
+		Reset				=> Reset,
+		RX_Data_Out		=> TX_Data,
+		RX_Ready			=> TX_Ready,
+		Rx					=> Tx
+	);
+	
+	PROCESS(TX_Ready) IS
+	BEGIN
+				
+		if rising_edge(TX_Ready) then
+			Hash_Tx <= Hash_Tx(247 downto 0) & TX_Data;
+		end if;
+			
+
 	END PROCESS;
 
 END;

@@ -126,7 +126,8 @@ begin
 			Clk				=> Clk,
 			Reset			=> Reset,
 			Hash_ready		=> Hash_ready,
-			Hash_input		=> Hash
+			Hash_input		=> Hash,
+			Tx					=> Tx
 		);
 
 end Behavioral;

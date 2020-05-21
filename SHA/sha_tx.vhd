@@ -14,6 +14,8 @@ library IEEE;
 --! use logic elements
 use IEEE.STD_LOGIC_1164.ALL;
 
+use work.sha_function.all;
+use work.constants.all;
 
 --! dividing the final sha result by eight bits and calling uart
 entity sha_tx is
@@ -28,7 +30,8 @@ port(
 	--! informs if incoming data is ready
 	Hash_ready			: in std_logic;
 	--! sha data
-	Hash_input			: in hash_array
+	Hash_input			: in hash_array;
+	Tx 					: out std_logic
 	);
 
 end sha_tx;
@@ -42,12 +45,12 @@ architecture Behavioral of sha_tx is
 
 		--Outputs
 	signal TX_Start : std_logic;
-	signal Tx : std_logic;
 	
 	signal new_d : std_logic := '0';
 
 	--! count to set when next uart packet should start 
-	signal count : integer range 1 to 33 := 33;
+	signal count_array 	: natural range 0 to 8 := 0;
+	signal count_dword 	: natural range 0 to 4 := 4;
 
 begin
  
@@ -66,25 +69,30 @@ begin
 	begin
 		if rising_edge(Clk) then
 			if Reset = '0' then
-				if count > 0 then
-					if count < 33 then 
-						if TX_Start = '0' then
+				if count_array < 8 then 
+					if TX_Start = '0' then
+						if count_dword > 0 then
 							TX_Go <= '1';
-							Tx_Data_Out <= Hash_input(count-1);
-							count <= count + 1;
-						else 
-							TX_Go <= '0';
+							Tx_Data_Out <= Hash_input(count_array)(count_dword*8-1 downto count_dword*8-8);
+							if count_dword > 1 then
+								count_dword <= count_dword - 1;
+							else
+								count_dword <= 0;
+							end if;
 						end if;
+						count_array <= count_array + 1;
+					else 
+						TX_Go <= '0';
 					end if;
 				end if;
-				if count = 33 then 
+				if count_array = 8 then 
 					if Hash_ready = '1' then
-						count <= 1;
+						count_array <= 0;
+						count_dword <= 4;
 					end if;
 				end if;
 			else 
 				Tx_Data_Out <= (others => '0');
-				Reset <= '1';
 			end if;
 		end if;
 	end process;

@@ -42,7 +42,7 @@ architecture Behavioral of uart_tx is
 --!  what freq count should have value to have right value of frequency
 constant max_freq_count	: integer := Clk_Frequenty / Baud;
 --! counts how long the byte is transmitted
-signal freq_count : integer range 0 to max_freq_count;
+signal freq_count : integer range 0 to max_freq_count - 1;
 --! count to set when next byte should start 
 signal count : integer range 0 to 10;
 
@@ -54,7 +54,7 @@ TX_PROCESS: process(Clk, Reset,TX_Go)
 	begin
 		if rising_edge(ClK) then
 			if Reset = '0' then
-				if freq_count < max_freq_count then
+				if freq_count < (max_freq_count - 1) then
 					freq_count <= freq_count + 1;
 					if count = 0 then
 						Tx <= '0';
@@ -65,7 +65,6 @@ TX_PROCESS: process(Clk, Reset,TX_Go)
 						end if;
 					end if;
 					if count = 9 then
-						TX_Start <= '1';
 						Tx <= '1';
 					else 
 						TX_Start <= '0';
@@ -76,17 +75,18 @@ TX_PROCESS: process(Clk, Reset,TX_Go)
 						count <= count + 1;
 					end if;		
 					if count = 10 then
+						TX_Start <= '1';
 						if TX_Go = '1' then
 							count <=0;
 							freq_count <= 0;
 						end if;
 					end if;
 				end if;
-				else 
-					TX_Start <= '1';
-					count <= 0;
-					Tx <= '1';
-					freq_count <= 0;
+			else 
+				TX_Start <= '1';
+				count <= 0;
+				Tx <= '1';
+				freq_count <= 0;
 			end if;
 		end if;
 	end process;
