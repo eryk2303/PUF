@@ -40,7 +40,8 @@ architecture Behavioral of uart_rx is
 	signal receiving : std_logic := '0';
 	--! buffer for incoming data including extra bits
 
-	signal data_buf : std_logic_vector(Data_Width + 2 downto 0);
+	--! 'to' is used for reverse trick on output assignment
+	signal data_buf : std_logic_vector(0 to Data_Width + 2);
 	--! determinates if data is ready to send to the output
 	signal data_ready : std_logic := '0';
 
@@ -76,7 +77,7 @@ begin
 					freq_count <= freq_count + 1;
 
 					if freq_count = (max_freq_count / 2) then
-						data_buf(data_buf'left-count) <= Rx;
+						data_buf(data_buf'right-count) <= Rx;
 					end if;
 
 				else
@@ -87,7 +88,7 @@ begin
 					elsif count >= (Data_Width + 2) then
 						receiving 	<= '0';
 						count 		<= 0;
-						if (data_buf(data_buf'left) = '0' and data_buf(1 downto 0) = "11") then
+						if (data_buf(data_buf'right) = '0' and data_buf(0 to 1) = "11") then
 							data_ready <= '1';
 						end if;
 					end if;
@@ -104,7 +105,7 @@ begin
 		if rising_edge(Clk) then
 			if (data_ready = '1') then
 				RX_Ready <= '1';
-				RX_Data_Out <= data_buf(data_buf'left-1 downto 2);
+				RX_Data_Out <= data_buf(2 to data_buf'right-1);
 			else
 				RX_Ready <= '0';
 			end if;
