@@ -54,7 +54,7 @@ begin
 	
 		if reset = '0' then
 
-			--! checks if should change into 'padding' mode
+			--! checks if should change into 'padding' mode after reciving all data
 			if input_finish = '1' and state = NORMAL then
 				--! calculates the number of zeros which will append the message
 				counter_zeros 			:= (448 - ( to_integer(unsigned(bit_counter)) + 1)) mod 512;
@@ -69,9 +69,13 @@ begin
 				--! state when incoming data is formed to 32-bit words
 				when NORMAL =>	
 				
+						--! one clock cycle delay for output 'ready' signal
+						if f_ready = '0' then
+							word_ready 	<= '0';
+						end if;
+				
 						if input_ready = '0' then
 							f_ready 		<= '0';
-							word_ready 	<= '0';
 						
 						elsif input_ready = '1' and f_ready = '0' then
 							bit_counter <= bit_counter + input_length;
@@ -129,7 +133,7 @@ begin
 										word_output <= std_logic_vector(bit_counter(63 downto 32));
 										
 									when 1 =>
-										word_output <= std_logic_vector(bit_counter(32 downto 0));
+										word_output <= std_logic_vector(bit_counter(31 downto 0));
 										state 		<= STOP;
 										
 									when others => null;

@@ -2,10 +2,10 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   20:37:38 03/26/2020
+-- Create Date:   09:48:42 05/22/2020
 -- Design Name:   
--- Module Name:   /home/eryk/Pulpit/UART/test.vhd
--- Project Name:  UART
+-- Module Name:   C:/Users/01131168/SHA/test_uart_tx.vhd
+-- Project Name:  SHA
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
@@ -32,25 +32,11 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY test IS
-END test;
+ENTITY test_uart_tx IS
+END test_uart_tx;
  
-ARCHITECTURE behavior OF test IS 
- 
-    -- Component Declaration for the Unit Under Test (UUT)
- 
-    COMPONENT uart_tx
-    PORT(
-         Clk : IN  std_logic;
-         Reset : IN  std_logic;
-         TX_Data_In : IN  std_logic_vector(7 downto 0);
-         TX_Go : IN  std_logic;
-         TX_Start : OUT  std_logic;
-         Tx : OUT  std_logic
-        );
-    END COMPONENT;
+ARCHITECTURE behavior OF test_uart_tx IS 
     
-
    --Inputs
    signal Clk : std_logic := '0';
    signal Reset : std_logic := '0';
@@ -60,15 +46,14 @@ ARCHITECTURE behavior OF test IS
  	--Outputs
    signal TX_Start : std_logic;
    signal Tx : std_logic;
-	signal new_d : std_logic := '0';
 
    -- Clock period definitions
-   constant Clk_period : time := 100 ns;
+   constant Clk_period : time := 83 ns;
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
-   uut: uart_tx PORT MAP (
+   uut: entity work.uart_tx PORT MAP (
           Clk => Clk,
           Reset => Reset,
           TX_Data_In => TX_Data_In,
@@ -85,24 +70,34 @@ BEGIN
 		Clk <= '1';
 		wait for Clk_period/2;
    end process;
-
+ 
 
    -- Stimulus process
-   stim_proc: process(TX_Start)
-   begin	
-	
-	if TX_Start = '0' then	
-		TX_Go	<= '1';
-		Reset	<= '0';
-		TX_Data_In	<= "01010101";
-	end if;
-	
-	if TX_Start = '1' then
-			TX_Go	<= '0';
-	end if;
-
-
+   stim_proc: process
+   begin		
+      TX_Data_In <= "01001000";
 		
+      wait for 1 ms;	
+
+		if TX_Start = '1' then 
+			TX_Data_In <= "01000000";
+		end if;
+      wait for Clk_period*10;
+
+      -- insert stimulus here 
+
+      wait;
    end process;
+	
+	process(TX_Start)
+	begin
+	
+	if TX_Start = '0' then 
+			TX_Go <= '0';
+	end if;
+	if TX_Start = '1' then 
+			TX_Go <= '1';
+	end if;
+	end process;
 
 END;

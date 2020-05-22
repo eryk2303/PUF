@@ -59,6 +59,7 @@ begin
 
 			last_Rx <= Rx;
 
+			--! waiting for data frame
 			if receiving = '0' then
 				--! checking for starting bit
 				if last_Rx = '1' and Rx = '0' then
@@ -68,24 +69,25 @@ begin
 				end if;
 				data_ready 		<= '0';
 
+			--! receiving data frame
 			elsif receiving = '1' then
 				
 				if freq_count < (max_freq_count - 1) then
 					freq_count <= freq_count + 1;
 
 					if freq_count = (max_freq_count / 2) then
-						data_buf(count) <= Rx;
+						data_buf(data_buf'left-count) <= Rx;
 					end if;
 
 				else
 					freq_count <= 0;
 
-					if (count < Data_Width) then
+					if count < (Data_Width + 2) then
 						count 		<= count + 1;
-					elsif (count = Data_Width) then
+					elsif count >= (Data_Width + 2) then
 						receiving 	<= '0';
 						count 		<= 0;
-						if (data_buf(0) = '0' and data_buf(data_buf'left-1 to data_buf'left) = "11") then
+						if (data_buf(data_buf'left) = '0' and data_buf(1 downto 0) = "11") then
 							data_ready <= '1';
 						end if;
 					end if;
@@ -96,14 +98,16 @@ begin
 	end process;
 
 
-	TO_OUTPUT : process(Clk, data_ready) is
+	TO_OUTPUT : process(Clk) is
 	begin
 
-		if (data_ready = '1') then
-			RX_Ready <= '1';
-			RX_Data_Out <= data_buf(data_buf'left-2 downto 1);
-		else
-			RX_Ready <= '0';
+		if rising_edge(Clk) then
+			if (data_ready = '1') then
+				RX_Ready <= '1';
+				RX_Data_Out <= data_buf(data_buf'left-1 downto 2);
+			else
+				RX_Ready <= '0';
+			end if;
 		end if;
 
 	end process;
