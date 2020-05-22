@@ -37,7 +37,8 @@ ARCHITECTURE behavior OF testbench IS
 	type UART_STATE_TYPE is (IDLE, START, DATA, STOP);
 	SIGNAL state_uart 	: UART_STATE_TYPE := IDLE;
 	SIGNAL uart_enable 	: std_logic := '0';
-	SIGNAL uart_data 		: std_logic_vector(DATA_WIDTH-1 downto 0);
+	--! 'to' is used for reverse trick on output assignment
+	SIGNAL uart_data 		: std_logic_vector(0 to DATA_WIDTH-1);
 	SIGNAL uart_counter	: natural range 0 to DATA_WIDTH+3 := 0;
 	
 	
