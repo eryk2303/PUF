@@ -1,8 +1,7 @@
 import serial
 import binascii
 
-ser = serial.Serial('COM4')
-ser.baudrate = 19200 
+ser = serial.Serial('COM4', 19200, stopbits = 2)
 
 def send_message(message):
     message_tmp = []
