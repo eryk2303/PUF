@@ -72,6 +72,11 @@ begin
 	variable count_dword 	: natural range 0 to 4 := 4;
 	variable tmp 				: DWORD;
 	begin
+	if Hash_ready = '0' then
+		hash_is_ready <= '0';
+		count_array := 0;
+	end if;
+	
 		if rising_edge(Clk) then
 			TX_Go <= '0';
 			if Reset = '0' then
@@ -92,7 +97,6 @@ begin
 								count_dword := 4;
 							end if;
 							if count_array = 8 then 
-								count_array := 0;
 								hash_is_ready <= '0';
 							end if;
 							
