@@ -1,26 +1,33 @@
 -------------------------------------------------------------------------------
 --! @file constants.vhdl
---! @brief Definition new type of value and constants variable 
+--! @brief Definitions of new types of values and constant variables
 -------------------------------------------------------------------------------
 
---! Use standart library 
+--! Use standart library
 library IEEE;
 --! use logic elements
 use IEEE.STD_LOGIC_1164.all;
+--! use numeric elements
+use IEEE.NUMERIC_STD.ALL;
 
 
-
---! Packet with definition new type of value and constants variable 
+--! Packet with definitions of new types of values and constant variables
 package constants is
 
---! Definition type of 32-bit word
+--! Type definition of 32-bit word
 subtype DWORD is std_logic_vector(31 downto 0);
 
---! Definition type for storing the constants array 
-type constants_value_sha256 is array(0 to 63) of DWORD;
+--! Type definition for storing message block's array of 32-bit words
+type message_block is array(0 to 15) of DWORD;
 
---! Array of constants value used in sha algoritm
-constant constants_value : constants_value_sha256 := (
+--! Type definition for storing message schedule's array of 32-bit words
+type message_schedule is array (0 to 63) of DWORD;
+
+--! Type definition for storing the constants array
+type constant_values_sha256 is array(0 to 63) of DWORD;
+
+--! Array of constant values used in sha algoritm
+constant constant_values : constant_values_sha256 := (
 			x"428a2f98", x"71374491", x"b5c0fbcf", x"e9b5dba5", x"3956c25b", x"59f111f1", x"923f82a4", x"ab1c5ed5",
 			x"d807aa98", x"12835b01", x"243185be", x"550c7dc3", x"72be5d74", x"80deb1fe", x"9bdc06a7", x"c19bf174",
 			x"e49b69c1", x"efbe4786", x"0fc19dc6", x"240ca1cc", x"2de92c6f", x"4a7484aa", x"5cb0a9dc", x"76f988da",
@@ -31,20 +38,32 @@ constant constants_value : constants_value_sha256 := (
 			x"748f82ee", x"78a5636f", x"84c87814", x"8cc70208", x"90befffa", x"a4506ceb", x"bef9a3f7", x"c67178f2"
 		);
 
---! Definition type for constants initial hash values
-type hash_array is array(0 to 7) of DWORD;	
-
+--! Type definition for constants initial hash values
+type hash_array is array(0 to 7) of DWORD;
 
 --! Initial hash values
-constant constants_initial : hash_array := (
-			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19");
+constant constant_initials : hash_array := (
+			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19"
+		);
 
+--! Type definition for storing 5 ascii characters in binary
+subtype command_type is std_logic_vector(39 downto 0);
 
---! Definition type for storing the array of 32-bit words
-type message_block is array(0 to 15) of DWORD;
+--! Type definition for storing ascii strings in binary
+type command_array_type is array(0 to 2) of command_type;
 
-type message_schedule is array (0 to 63) of DWORD;
-		
+--! Array of constant ascii strings
+constant command_array : command_array_type := (
+			x"5354415254", --! "START"
+			x"46494e4953", --! "FINIS"
+			x"5245534554"  --! "RESET"
+		);
+
+--! Aliases for command array's elements
+alias com_START : command_type is command_array(0);
+alias com_FINIS : command_type is command_array(1);
+alias com_RESET : command_type is command_array(2);
+
 end constants;
 
 
