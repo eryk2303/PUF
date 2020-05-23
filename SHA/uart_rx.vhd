@@ -1,4 +1,4 @@
---! use standart library 
+--! use standard library
 library IEEE;
 --! use logic elements
 use IEEE.STD_LOGIC_1164.ALL;
@@ -9,27 +9,28 @@ use IEEE.NUMERIC_STD.ALL;
 use work.sha_function.all;
 use work.constants.all;
 
-entity uart_rx is
-generic(
-		CLK_FREQUENCY	: positive := 12000000;
-		--! UART message  length
-		DATA_WIDTH 		: positive := 8;
-		--! UART baud rate
-		BAUD			: positive := 19200
+--! Definition of UART RX
+entity UART_RX is
+	generic(
+			CLK_FREQUENCY	: positive := 12000000;
+			--! UART message  length
+			DATA_WIDTH 		: positive := 8;
+			--! UART baud rate
+			BAUD			: positive := 19200
+			);
+	port(
+		Clk					: in std_logic;
+		Reset				: in std_logic;
+		--! Rx pin for receiving
+		Rx					: in std_logic;
+		--! received data
+		RX_Data_Out			: out std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! determinates if data on output is ready
+		RX_Ready			: out std_logic := '0'
 		);
-port(
-	Clk					: in std_logic;
-	Reset				: in std_logic;
-	--! Rx pin for receiving
-	Rx					: in std_logic
-	--! determinates if data on output is ready
-	RX_Ready			: out std_logic := '0';
-	--! received data
-	RX_Data_Out			: out std_logic_vector(DATA_WIDTH - 1 downto 0);
-	);
-end uart_rx;
+end UART_RX;
 
-architecture Behavioral of uart_rx is
+architecture Behavioral of UART_RX is
 
 	--! length of one bit in clock cycles
 	constant MAX_FREQ_COUNT	: positive := CLK_FREQUENCY / BAUD;
@@ -38,7 +39,7 @@ architecture Behavioral of uart_rx is
 	signal freq_count 	: natural range 0 to MAX_FREQ_COUNT - 1;
 	--! counting received bits
 	signal count 		: natural range 0 to DATA_WIDTH + 2;
-	
+
 	--! temporarily keeps last state of Rx input
 	signal last_Rx 		: std_logic;
 	--! determinates if process is in receiving state
@@ -51,7 +52,7 @@ architecture Behavioral of uart_rx is
 
 begin
 
-	RX_MAIN : process(Clk, Reset) is
+	RX_PROCESS : process(Clk, Reset) is
 	begin
 
 		if Reset = '1' then
@@ -77,7 +78,6 @@ begin
 
 			--! receiving data frame
 			elsif receiving = '1' then
-				--! 
 				if freq_count < (MAX_FREQ_COUNT - 1) then
 					freq_count <= freq_count + 1;
 
@@ -91,8 +91,9 @@ begin
 					if count < (DATA_WIDTH + 2) then
 						count 		<= count + 1;
 					elsif count >= (DATA_WIDTH + 2) then
-						receiving 	<= '0';
 						count 		<= 0;
+						receiving 	<= '0';
+
 						if (data_buf(data_buf'right) = '0' and data_buf(0 to 1) = "11") then
 							data_ready <= '1';
 						end if;
@@ -110,10 +111,10 @@ begin
 
 		if rising_edge(Clk) then
 			if (data_ready = '1') then
-				RX_Ready <= '1';
+				RX_Ready 	<= '1';
 				RX_Data_Out <= data_buf(2 to data_buf'right-1);
 			else
-				RX_Ready <= '0';
+				RX_Ready 	<= '0';
 			end if;
 		end if;
 

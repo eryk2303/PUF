@@ -12,34 +12,33 @@ use work.constants.all;
 ENTITY test_main IS
 END test_main;
 
-ARCHITECTURE behavior OF test_main IS 
+ARCHITECTURE behavior OF test_main IS
 
 	--! IO signals of 'sha_main.vhd'
 	SIGNAL Clk 		: std_logic := '0';
+	SIGNAL Reset 	: std_logic := '0';
 	SIGNAL Rx		: std_logic := '1';
 	SIGNAL Tx		: std_logic := '1';
-	SIGNAL Reset 	: std_logic := '0';
-		
+
 	SIGNAL File_buffer	: std_logic_vector(511 downto 0);
-	
 
 	type ByteFileType is file of character;
-	
+
 	constant FileName : string := "example.bin";
 
-	constant Clk_Frequenty		: positive := 12000000;
-	constant DATA_WIDTH 		: integer := 8;
-	constant Baud				: positive := 19200;
+	constant CLK_FREQUENCY		: positive := 12000000;
+	constant DATA_WIDTH 		: positive := 8;
+	constant BAUD				: positive := 19200;
 
-	
+
 	type UART_STATE_TYPE is (IDLE, START, DATA, STOP);
 	SIGNAL state_uart 	: UART_STATE_TYPE := IDLE;
 	SIGNAL uart_enable 	: std_logic := '0';
 	--! 'to' is used for reverse trick on output assignment
 	SIGNAL uart_data 		: std_logic_vector(0 to DATA_WIDTH-1);
 	SIGNAL uart_counter	: natural range 0 to DATA_WIDTH+3 := 0;
-	
-	
+
+
 	SIGNAL TX_Data			: std_logic_vector(DATA_WIDTH-1 downto 0);
 	SIGNAL TX_Ready		: std_logic := '0';
 	SIGNAL Hash_Tx			: std_logic_vector(255 downto 0) := (others => '0');
@@ -48,37 +47,44 @@ ARCHITECTURE behavior OF test_main IS
 
 	SIGNAL f_full		: std_logic := '0';
 	SIGNAL f_finish	: std_logic := '0';
+
 BEGIN
 
 	clock:	Clk <= not Clk after 100 ns;
 
-	uut: entity work.MAIN PORT MAP(
-			Clk_input(0) 		=> Clk,
-			Rx_input(0)			=> Rx,
-			Tx_input(0)			=> Tx,
-			Reset_input(0) 		=> Reset
-	);
+	uut: ENTITY work.MAIN
+		GENERIC MAP(
+			CLK_FREQUENCY	=> CLK_FREQUENCY,
+			DATA_WIDTH 		=> DATA_WIDTH,
+			BAUD			=> BAUD
+		)
+		PORT MAP(
+				Clk_input(0) 		=> Clk,
+				Reset_input(0) 		=> Reset,
+				Rx_input(0)			=> Rx,
+				Tx_output(0)			=> Tx
+		);
 
 
-	
+
 	COMMANDER : PROCESS(Clk) IS
 
 		function to_std_logic_vector(input : string) return std_logic_vector is
 			variable output : std_logic_vector(input'length*8 - 1 downto 0);
 		begin
-
 			for i in input'range loop
 				output(i*8-1 downto i*8-8) := std_logic_vector(to_unsigned(character'pos(input(input'length-i+1)), 8));
 			end loop;
+
 			return output;
-			
+
 		end function to_std_logic_vector;
-		
+
 		file DataFile 			: ByteFileType open read_mode is FileName;
 		variable Data_length	: integer := 0;
 		variable char_buffer : character;
-		
-		
+
+
 		type STATE_TYPE is (COMMAND, TRANSMIT, IDLE, STOP);
 		variable state : STATE_TYPE := IDLE;
 
@@ -87,9 +93,9 @@ BEGIN
 
 
 	BEGIN
-			
+
 		if f_full = '0' then
-		
+
 			if Data_length = 512 or endfile(DataFile) then
 
 				f_full <= '1';
@@ -98,7 +104,7 @@ BEGIN
 				end if;
 
 			end if;
-		
+
 			if not endfile(DataFile) then
 				read(DataFile, char_buffer);
 
@@ -106,7 +112,7 @@ BEGIN
 
 				Data_length := Data_length + 8;
 			end if;
-			
+
 
 
 		end if;
@@ -114,18 +120,18 @@ BEGIN
 		if Data_length <= 0 and not endfile(DataFile) then
 			f_full <= '0';
 		end if;
-			
-			
-			
+
+
+
 		case state is
 
 			when IDLE =>
 					if f_full = '1' and Data_length > 0 then
 						state := COMMAND;
 						command_counter := 64;
-						command_buffer	:= std_logic_vector(to_std_logic_vector("START")) & 
-												std_logic_vector(to_unsigned( 	(Data_length / 100)  + 48, 			8)) & 
-												std_logic_vector(to_unsigned(	((Data_length / 10) mod 10) + 48, 		8)) & 
+						command_buffer	:= std_logic_vector(to_std_logic_vector("START")) &
+												std_logic_vector(to_unsigned( 	(Data_length / 100)  + 48, 			8)) &
+												std_logic_vector(to_unsigned(	((Data_length / 10) mod 10) + 48, 		8)) &
 												std_logic_vector(to_unsigned( 	(Data_length mod 10)  + 48, 			8));
 					end if;
 
@@ -162,8 +168,8 @@ BEGIN
 							end if;
 						end if;
 					end if;
-					
-					
+
+
 				when STOP =>
 						null;
 
@@ -172,24 +178,24 @@ BEGIN
 		if state_uart = STOP and uart_enable = '1' then
 			uart_enable <= '0';
 		end if;
-				
+
 	END PROCESS;
 
 	TRANSMITTER : PROCESS(Clk) IS
 		--! length of one bit in clock cycles
-		constant max_freq_count	: positive := Clk_Frequenty / Baud;
+		constant MAX_FREQ_COUNT	: positive := CLK_FREQUENCY / BAUD;
 		--! used for counting clock cycles
-		variable freq_count : natural range 0 to max_freq_count - 1 := 0;
+		variable freq_count : natural range 0 to MAX_FREQ_COUNT - 1 := 0;
 	BEGIN
-				
+
 			if rising_edge(Clk) then
-				
-				if freq_count < (max_freq_count - 1) then
+
+				if freq_count < (MAX_FREQ_COUNT - 1) then
 					freq_count := freq_count + 1;
 
 				else
 					freq_count := 0;
-					
+
 					case state_uart is
 
 						when IDLE =>
@@ -197,7 +203,7 @@ BEGIN
 							if uart_enable = '1' then
 								state_uart 	<= START;
 								uart_counter <= DATA_WIDTH + 2;
-							end if; 
+							end if;
 
 						when START =>
 							Rx 				<= '0';
@@ -217,30 +223,35 @@ BEGIN
 								state_uart 	<= IDLE;
 							end if;
 					end case;
-				
+
 				end if;
 
 			end if;
 	END PROCESS;
-	
-	
-	
-	TX_RECIEVER : entity work.uart_rx
-	port map(
-		Clk 				=> Clk,
-		Reset				=> Reset,
-		RX_Data_Out		=> TX_Data,
-		RX_Ready			=> TX_Ready,
-		Rx					=> Tx
-	);
-	
+
+
+
+	TX_RECIEVER : ENTITY work.UART_RX
+		GENERIC MAP(
+			CLK_FREQUENCY	=> CLK_FREQUENCY,
+			DATA_WIDTH 		=> DATA_WIDTH,
+			BAUD			=> BAUD
+		)
+		PORT MAP(
+			Clk 				=> Clk,
+			Reset				=> Reset,
+			Rx					=> Tx,
+			RX_Data_Out			=> TX_Data,
+			RX_Ready			=> TX_Ready
+		);
+
 	PROCESS(TX_Ready) IS
 	BEGIN
-				
+
 		if rising_edge(TX_Ready) then
 			Hash_Tx <= Hash_Tx(247 downto 0) & TX_Data;
 		end if;
-			
+
 
 	END PROCESS;
 
