@@ -63,19 +63,19 @@ begin
 			Tx => Tx
         );
 
-	process(Clk, Reset, Hash_ready) is
+	process(Clk, Reset) is
 
 	--! count to set when next uart packet should start
 	variable count_array 	: natural range 0 to 8 := 0;
 	variable count_dword 	: natural range 0 to 4 := 4;
 	variable tmp 				: DWORD;
 	begin
-	if Hash_ready = '0' then
-		hash_is_ready <= '0';
-		count_array := 0;
-	end if;
 	
 		if rising_edge(Clk) then
+			if Hash_ready = '0' then
+				hash_is_ready <= '0';
+				count_array := 0;
+			end if;
 			TX_Ready <= '0';
 			if Reset = '0' then
 				if Hash_ready = '1' then
