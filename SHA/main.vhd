@@ -106,8 +106,6 @@ begin
 			Output_length 	=> UC_Output_length,
 			Output_ready 	=> UC_Output_ready,
 			Output_finish 	=> UC_Output_finish,
-			Hash_input		=> Hash,
-			Hash_ready		=> Hash_ready,
 			Reset			=> Reset_input(0),
 			Reset_all 		=> Reset_All
 		);
