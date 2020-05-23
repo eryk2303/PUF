@@ -16,7 +16,7 @@ entity MAIN is
 	port(
 		Clk_input 		: in std_logic_vector(0 downto 0);
 		Rx_input			: in std_logic_vector(0 downto 0);
-		Tx_input			: out std_logic_vector(0 downto 0);
+		Tx_output			: out std_logic_vector(0 downto 0);
 		Reset_input 	: in std_logic_vector(0 downto 0)
 	);
 end MAIN;
@@ -57,7 +57,7 @@ begin
 	Clk	<= Clk_input(0);
 	Rx		<= Rx_input(0);
 	Reset	<= Reset_input(0);
-	Tx_input(0)		<= Tx;
+	Tx_output(0)		<= Tx;
 
 	U1 : entity work.uart_rx
 		port map(

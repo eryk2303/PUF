@@ -1,8 +1,7 @@
--- TestBench Template 
-
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
+--! for reading/writing files
 USE ieee.std_logic_textio.ALL;
 LIBRARY std;
 USE std.textio.all;
@@ -10,11 +9,12 @@ USE std.textio.all;
 use work.sha_function.all;
 use work.constants.all;
 
-ENTITY testbench IS
-END testbench;
+ENTITY test_main IS
+END test_main;
 
-ARCHITECTURE behavior OF testbench IS 
+ARCHITECTURE behavior OF test_main IS 
 
+	--! IO signals of 'sha_main.vhd'
 	SIGNAL Clk 		: std_logic := '0';
 	SIGNAL Rx		: std_logic := '1';
 	SIGNAL Tx		: std_logic := '1';
@@ -22,14 +22,12 @@ ARCHITECTURE behavior OF testbench IS
 		
 	SIGNAL File_buffer	: std_logic_vector(511 downto 0);
 	
-	SIGNAL f_full		: std_logic := '0';
-	SIGNAL f_finish	: std_logic := '0';
 
 	type ByteFileType is file of character;
 	
 	constant FileName : string := "example.bin";
 
-	constant	Clk_Frequenty	: positive := 12000000;
+	constant Clk_Frequenty		: positive := 12000000;
 	constant DATA_WIDTH 		: integer := 8;
 	constant Baud				: positive := 19200;
 
@@ -48,16 +46,18 @@ ARCHITECTURE behavior OF testbench IS
 
 
 
+	SIGNAL f_full		: std_logic := '0';
+	SIGNAL f_finish	: std_logic := '0';
 BEGIN
 
-	clock:		Clk <= not Clk after 100 ns;
+	clock:	Clk <= not Clk after 100 ns;
 
-   uut: entity work.MAIN PORT MAP(
-         Clk_input(0) 		=> Clk,
-         Rx_input(0)			=> Rx,
-         Tx_input(0)			=> Tx,
-         Reset_input(0) 	=> Reset
-   );
+	uut: entity work.MAIN PORT MAP(
+			Clk_input(0) 		=> Clk,
+			Rx_input(0)			=> Rx,
+			Tx_input(0)			=> Tx,
+			Reset_input(0) 		=> Reset
+	);
 
 
 	

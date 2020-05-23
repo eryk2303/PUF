@@ -57,7 +57,7 @@ begin
 			--! checks if should change into 'padding' mode after reciving all data
 			if input_finish = '1' and state = NORMAL then
 				--! calculates the number of zeros which will append the message
-				counter_zeros 			:= (448 - ( to_integer(unsigned(bit_counter)) + 1)) mod 512;
+				counter_zeros 			:= (448 - ( to_integer(unsigned(bit_counter(31 downto 0))) + 1)) mod 512;
 				--! bit '1' is appended to the end of the message
 				word_buffer(ptr_b-1) <= '1';
 				ptr_b := ptr_b - 1;

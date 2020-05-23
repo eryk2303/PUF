@@ -6,7 +6,7 @@
 --! @brief Definition UART TX
 ----------------------------------------------------------------------------------
 
---! Use standart library 
+--! use standart library 
 library IEEE;
 --! use logic elements
 use IEEE.STD_LOGIC_1164.ALL;
