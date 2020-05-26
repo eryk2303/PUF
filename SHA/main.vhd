@@ -148,6 +148,7 @@ begin
 			Word_input 		=> S2_Word_output,
 			Word_in_nr	 	=> S2_Word_out_nr,
 			Word_req_id 	=> S3_Word_req_id,
+			Output_finish	=> UC_Output_finish,
 			Hash_output 	=> Hash,
 			Hash_ready		=> Hash_ready,
 			Reset 			=> Reset

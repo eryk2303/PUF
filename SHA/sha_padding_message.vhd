@@ -73,6 +73,7 @@ begin
 						if Input_ready = '0' then
 							f_ready 	<= '0';
 							Word_ready 	<= '0';
+							Word_output <= (others => '0');
 
 						elsif Input_ready = '1' and f_ready = '0' then
 							bit_counter <= bit_counter + Input_length;
@@ -80,7 +81,6 @@ begin
 
 							--! checks wheter input data fits in the buffer or not
 							if (ptr_b - Input_length) > 0 then
-								word_buffer 	<= (others => '0');
 								word_buffer(ptr_b-1 downto ptr_b-Input_length) <= Input_data(DATA_WIDTH-1 downto DATA_WIDTH-Input_length);
 								ptr_b 			:= ptr_b - Input_length;
 							--! when input data entirely fits to the end of the buffer

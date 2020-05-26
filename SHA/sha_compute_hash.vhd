@@ -13,6 +13,9 @@ entity COMPUTE_HASH is
 		Word_input 		: in  DWORD;
 		Word_in_nr	 	: in  natural range 0 to 64;
 		Word_req_id 	: out natural range 0 to 63;
+		
+		--! states if all data was already transmitted
+		Output_finish	: in std_logic;
 
 		--! output interface
 		Hash_output 	: out hash_array;
@@ -81,7 +84,11 @@ begin
 
 				when ADD =>
 						adding(hash, working_vars);
-						Hash_ready		<= '1';
+						if Output_finish = '1' then
+							Hash_ready		<= '1';
+						else 
+							Hash_ready		<= '0';
+						end if;
 						state 			<= INITIALIZE;
 
 				when INITIALIZE =>
