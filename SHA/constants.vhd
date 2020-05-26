@@ -46,24 +46,6 @@ constant constant_initials : hash_array := (
 			x"6a09e667", x"bb67ae85", x"3c6ef372", x"a54ff53a", x"510e527f", x"9b05688c", x"1f83d9ab", x"5be0cd19"
 		);
 
---! Type definition for storing 5 ascii characters in binary
-subtype command_type is std_logic_vector(39 downto 0);
-
---! Type definition for storing ascii strings in binary
-type command_array_type is array(0 to 2) of command_type;
-
---! Array of constant ascii strings
-constant command_array : command_array_type := (
-			x"5354415254", --! "START"
-			x"46494e4953", --! "FINIS"
-			x"5245534554"  --! "RESET"
-		);
-
---! Aliases for command array's elements
-alias com_START : command_type is command_array(0);
-alias com_FINIS : command_type is command_array(1);
-alias com_RESET : command_type is command_array(2);
-
 end constants;
 
 

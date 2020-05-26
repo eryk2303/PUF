@@ -17,12 +17,14 @@ entity MAIN is
 		DATA_WIDTH 		: positive := 8;
 		--! UART baud rate
 		BAUD			: positive := 19200
+	
 	);
 	port(
 		Clk_input 		: in std_logic_vector(0 downto 0);
 		Reset_input 	: in std_logic_vector(0 downto 0);
 		Rx_input		: in std_logic_vector(0 downto 0);
-		Tx_output		: out std_logic_vector(0 downto 0)
+		Tx_output		: out std_logic_vector(0 downto 0);
+		Hash_ready_out 		:out std_logic
 	);
 end MAIN;
 
@@ -64,6 +66,7 @@ begin
 
 	Rx				<= Rx_input(0);
 	Tx_output(0)	<= Tx;
+	Hash_ready_out <= Hash_ready;
 
 
 	U1 : entity work.UART_RX
@@ -106,8 +109,6 @@ begin
 			Output_length 	=> UC_Output_length,
 			Output_ready 	=> UC_Output_ready,
 			Output_finish 	=> UC_Output_finish,
-			Hash_input		=> Hash,
-			Hash_ready		=> Hash_ready,
 			Reset			=> Reset_input(0),
 			Reset_all 		=> Reset_All
 		);

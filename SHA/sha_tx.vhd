@@ -32,22 +32,18 @@ end SHA_TX;
 
 architecture Behavioral of SHA_TX is
 
-	--! Inputs
+	--! Inputs from uart_tx
 	signal TX_Data_Out : std_logic_vector(7 downto 0);
 	signal TX_Ready : std_logic :=  '0';
 
-	--! Outputs
+	--! Outputs from uart_tx
 	signal TX_Start : std_logic;
-
 	signal new_d : std_logic := '0';
 
 
-
-	signal hash_is_ready : std_logic;
-
 begin
 
-	--! declaration uart_tx component
+	--! declaration uart_tx 
 	UART_TX: entity work.UART_TX
 		generic map(
 			CLK_FREQUENCY	=> CLK_FREQUENCY,
@@ -63,42 +59,42 @@ begin
 			Tx => Tx
         );
 
-	process(Clk, Reset, Hash_ready) is
+	process(Clk, Reset) is
 
 	--! count to set when next uart packet should start
 	variable count_array 	: natural range 0 to 8 := 0;
 	variable count_dword 	: natural range 0 to 4 := 4;
 	variable tmp 				: DWORD;
-	begin
-	if Hash_ready = '0' then
-		hash_is_ready <= '0';
-		count_array := 0;
-	end if;
+	variable hash_is_ready : natural range 0 to 1 := 0;
 	
+	begin
 		if rising_edge(Clk) then
+			if Hash_ready = '0' then
+					hash_is_ready := 0;
+					count_array := 0;
+				end if;
 			TX_Ready <= '0';
 			if Reset = '0' then
 				if Hash_ready = '1' then
-					hash_is_ready <= '1';
+					hash_is_ready := 1;
 				end if;
-				if hash_is_ready = '1' then
+				if hash_is_ready = 1 then
 					if TX_Start = '1' then
 						if count_array < 8 then
 							if count_dword > 0 then
-								TX_Ready <= '1';
-								tmp := Hash_input(count_array);
-								TX_Data_Out <= tmp(count_dword*8-1 downto count_dword*8-8);
-								count_dword := count_dword - 1;
+								if TX_Ready = '0' then
+									TX_Ready <= '1';
+									TX_Data_Out <= Hash_input(count_array)(count_dword*8-1 downto count_dword*8-8);
+									count_dword := count_dword - 1;
+								end if;
 							end if;
 							if count_dword = 0 then
 								count_array := count_array + 1;
 								count_dword := 4;
 							end if;
 							if count_array = 8 then
-								count_array := 0;
-								hash_is_ready <= '0';
+								hash_is_ready := 0;
 							end if;
-
 						end if;
 					end if;
 				end if;

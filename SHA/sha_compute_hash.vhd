@@ -44,14 +44,14 @@ architecture Behavioral of COMPUTE_HASH is
 begin
 
 	process(Clk, Reset) is
-
+		
 		variable K : DWORD;
 		variable W : DWORD;
 
 		variable iter : natural := 0;
 
 	begin
-
+		
 		if Reset = '0' then
 
 			case state is

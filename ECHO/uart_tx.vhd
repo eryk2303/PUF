@@ -5,10 +5,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 --! use numeric elements
 use IEEE.NUMERIC_STD.ALL;
 
---! use work packages
-use work.sha_function.all;
-use work.constants.all;
-
 --! Definition of UART TX
 entity uart_tx is
 	generic(

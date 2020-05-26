@@ -30,10 +30,6 @@ entity UART_COMMANDER is
 		Output_ready 	: out std_logic := '0';
 		Output_finish 	: inout std_logic := '0';
 
-		--! calculated hash to transmit
-		Hash_input		: in hash_array;
-		Hash_ready		: in std_logic;
-
 		Reset			: in std_logic;
 		Reset_all 		: out std_logic := '1'
 	);
@@ -137,13 +133,6 @@ begin
 			counter			:= 0;
 		end if;
 
-	end process;
-
-	TX_COMMANDER : process(Clk) is
-	begin
-		if Output_finish = '1' and Hash_ready = '1' then
-			null;
-		end if;
 	end process;
 
 

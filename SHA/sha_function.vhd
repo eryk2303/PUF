@@ -36,25 +36,6 @@ function code_e(h, e, f, g, d, M, K : std_logic_vector) return std_logic_vector;
 --! Function with calculatete temporary values used to code value
 function code_a(h, e, f, g, a, b, c, M, K : std_logic_vector) return std_logic_vector;
 
---! Function with calculatete temporary values used to code value
-function code_M(
-                --! expanded message blocks
-                constant data :  	message_block;
-                --! input word
-                constant word_input : in std_logic_vector(31 downto 0);
-                --! number of iteration
-                constant iterator :  std_logic_vector(5 downto 0)
-                ) return std_logic_vector;
-
---! compression function for current iteration
-procedure transform(
-                --! Hash values from the previous iteration
-                signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
-                --! Expanded message block value for current intertion
-                constant M : in std_logic_vector(31 downto 0);
-                --! constants_value for current intertion
-                constant K : in std_logic_vector(31 downto 0)
-                );
 
 --! add previous and current value
  procedure adding(
@@ -126,67 +107,6 @@ package body sha_function is
 
         return std_logic_vector(unsigned(tmp1) + unsigned(tmp2));
     end function code_a;
-
-
-    function code_M(
-                constant data 	    :  message_block;
-                constant word_input : in std_logic_vector(31 downto 0);
-                constant iterator   :  std_logic_vector(5 downto 0)
-                ) return std_logic_vector
-    is
-        variable i : integer := to_integer(unsigned(iterator));
-    begin
-
-        if i < 16 then
-            return word_input;
-        else
-            return std_logic_vector(unsigned(SIG1(data(i - 2))) + unsigned(data(i - 7)) + unsigned(SIG0(data(i - 15))) + unsigned(data(i - 16)));
-        end if;
-
-    end function code_M;
-
-
-    procedure transform(
-                    signal h0, h1, h2, h3, h4, h5, h6, h7 : inout  std_logic_vector(31 downto 0);
-                    constant M : in std_logic_vector(31 downto 0);
-                    constant K : in std_logic_vector(31 downto 0)
-                    ) is
-
-		variable a, b, c, d, e, f, g, h : std_logic_vector(31 downto 0);
-
-        begin
-
-
-            a := h0;
-            b := h1;
-            c := h2;
-            d := h3;
-            e := h4;
-            f := h5;
-            g := h6;
-            h := h7;
-
-
-            h := g;
-            g := f;
-            f := e;
-            e := code_e(h, e, f, g, d, M, K);
-            d := c;
-            c := b;
-            b := a;
-            a := code_a(h, e, f, g, a, b, c, M, K);
-
-            h0 <= a;
-            h1 <= b;
-            h2 <= c;
-            h3 <= d;
-            h4 <= e;
-            h5 <= f;
-            h6 <= g;
-            h7 <= h;
-
-    end procedure;
-
 
 
     procedure adding(
