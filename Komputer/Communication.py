@@ -18,10 +18,10 @@ def send_message(message):
         start = 'START' + str('{:03d}'.format(len(ms)*8))
         ms = ms.encode("utf-8")
         start = start.encode("ascii")
-        ser.write(start)
+        #ser.write(start)
         ser.write(ms)
-    ser.write(finish)
-    get = ser.read(32)
+    #ser.write(finish)
+    get = ser.read(len(message))
     
     return get
     
