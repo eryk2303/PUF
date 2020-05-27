@@ -16,16 +16,16 @@ entity UART_COMMANDER is
 	port(
 		Clk 			: in std_logic;
 
-		--! Rx interface
+		--! 	Rx interface
+		--! Raw data from UART_RX
 		RX_Data 		: in std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! states if RX_Data is ready to be catched
 		RX_Ready 		: in std_logic;
 
-		--! Tx interface
-	--	TX_Data		: out std_logic_vector(DATA_WIDTH - 1 downto 0);
-	--	TX_Ready		: out std_logic := '0';
-
-		--! output interface
+		--! 	Output interface
+		--! Received data for hash calculation
 		Output_data 	: out std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! length of 
 		Output_length 	: out positive range 1 to DATA_WIDTH;
 		Output_ready 	: out std_logic := '0';
 		Output_finish 	: inout std_logic := '0';

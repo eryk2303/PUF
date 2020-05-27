@@ -20,40 +20,50 @@ entity MAIN is
 	
 	);
 	port(
+		--! clock external input
 		Clk_input 		: in std_logic_vector(0 downto 0);
+		--! reset external input
 		Reset_input 	: in std_logic_vector(0 downto 0);
+		--! Rx external input
 		Rx_input		: in std_logic_vector(0 downto 0);
+		--! Tx external output
 		Tx_output		: out std_logic_vector(0 downto 0);
+		--! temporarly for tests
 		Hash_ready_out 		:out std_logic
 	);
 end MAIN;
 
 architecture Behavioral of MAIN is
 
+	--! signals for external ports
 	signal Clk			: std_logic;
 	signal Reset		: std_logic;
 	signal Rx			: std_logic;
 	signal Tx			: std_logic;
 
+	--! buffer for reset
 	signal Reset_All 		: std_logic;
 
+	--! signals between UART_COMMANDER	
 	signal RX_Data 			: std_logic_vector(DATA_WIDTH - 1 downto 0);
 	signal RX_Ready			: std_logic;
 
+	--! signals between COMPUTE_HASH and SHA_TX
 	signal Hash				: hash_array;
 	signal Hash_ready		: std_logic;
 
-
+	--! signals between UART_COMMANDER and PADDING_MESSAGE
 	signal UC_Output_data 	: std_logic_vector(DATA_WIDTH - 1 downto 0);
 	signal UC_Output_length : positive range 1 to DATA_WIDTH;
 	signal UC_Output_ready 	: std_logic;
 	signal UC_Output_finish : std_logic;
 
+	--! signals between PADDING_MESSAGE and PREPARE_SCHEDULE
 	signal S1_Word_output	: DWORD;
 	signal S1_Word_id		: natural range 0 to 15;
 	signal S1_Word_ready	: std_logic;
 
-
+	--! signals between PREPARE_SCHEDULE and COMPUTE_HASH
 	signal S2_Word_output	: DWORD;
 	signal S2_Word_out_nr	: natural range 0 to 64;
 	signal S3_Word_req_id	: natural range 0 to 63;
@@ -66,7 +76,7 @@ begin
 
 	Rx				<= Rx_input(0);
 	Tx_output(0)	<= Tx;
-	Hash_ready_out <= Hash_ready;
+	Hash_ready_out 	<= Hash_ready;
 
 
 	U1 : entity work.UART_RX
