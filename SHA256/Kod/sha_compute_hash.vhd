@@ -9,16 +9,21 @@ entity COMPUTE_HASH is
 	port(
 		Clk 				: in std_logic;
 
-		--! input interface
+		--! 	input interface
+		--! 32-bit inpuy word
 		Word_input 		: in  DWORD;
+		--! number of output word (id + 1, 0 means output is not ready)
 		Word_in_nr	 	: in  natural range 0 to 64;
+		--! id of requested word
 		Word_req_id 	: out natural range 0 to 63;
 		
 		--! states if all data was already transmitted
 		Output_finish	: in std_logic;
 
-		--! output interface
+		--! 	output interface
+		--! calculated hash on output
 		Hash_output 	: out hash_array;
+		--! states is hash on output is ready to be read
 		Hash_ready		: out std_logic := '0';
 
 		Reset 			: in std_logic
@@ -27,7 +32,9 @@ end COMPUTE_HASH;
 
 architecture Behavioral of COMPUTE_HASH is
 
+	--! types of states for process of COMPUTE_HASH
 	type STATE_TYPE is (COMPUTE, ADD, INITIALIZE);
+	--! determinates the state of the process
 	signal state 	: STATE_TYPE := COMPUTE;
 
 	--! working variables used in computation
@@ -48,9 +55,11 @@ begin
 
 	process(Clk, Reset) is
 		
+		--! varaible for temporarly storing constant
 		variable K : DWORD;
+		--! variable for temporarly storing word from the schedule
 		variable W : DWORD;
-
+		--! iterator used in main "loop"
 		variable iter : natural := 0;
 
 	begin
@@ -59,6 +68,7 @@ begin
 
 			case state is
 
+				--! main "loop"
 				when COMPUTE =>
 					--! checks if requested word is on input
 					if Word_in_nr = (iter + 1) then
@@ -81,7 +91,7 @@ begin
 							state <= ADD;
 						end if;
 					end if;
-
+				
 				when ADD =>
 						adding(hash, working_vars);
 						if Output_finish = '1' then

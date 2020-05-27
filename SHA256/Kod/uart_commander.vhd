@@ -16,37 +16,43 @@ entity UART_COMMANDER is
 	port(
 		Clk 			: in std_logic;
 
-		--! Rx interface
+		--! 	Rx interface
+		--! Raw data from UART_RX
 		RX_Data 		: in std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! states if RX_Data is ready to be read
 		RX_Ready 		: in std_logic;
 
-		--! Tx interface
-	--	TX_Data		: out std_logic_vector(DATA_WIDTH - 1 downto 0);
-	--	TX_Ready		: out std_logic := '0';
-
-		--! output interface
+		--! 	Output interface
+		--! received data for hash calculation
 		Output_data 	: out std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! length of data counted from the highest bit
 		Output_length 	: out positive range 1 to DATA_WIDTH;
+		--! states is data on output is ready to be read
 		Output_ready 	: out std_logic := '0';
+		--! states if all data was transmited for hash calculation
 		Output_finish 	: inout std_logic := '0';
 
 		Reset			: in std_logic;
+		--! resets blocks after receiving "RESET" command
 		Reset_all 		: out std_logic := '1'
 	);
 end UART_COMMANDER;
 
 architecture Behavioral of UART_COMMANDER is
 
+	--! types of states for RX_COMMANDER
 	type STATE_TYPE is (WAITING, RECEIVING);
+	--! determinates the state of RX_COMMANDER
 	signal state 	: STATE_TYPE := WAITING;
 
-	--! flag for blocking
+	--! flag for blocking condition
 	signal f_ready 	: std_logic := '0';
 
 begin
 
 	RX_COMMANDER : process(Clk, Reset) is
 
+		--! funcition which changes ascii digits to integers
 		function ascii_to_integer(input : std_logic_vector) return integer is
 			variable output : integer := 0;
 		begin

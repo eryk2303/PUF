@@ -12,15 +12,22 @@ entity PADDING_MESSAGE is
 	port(
 		Clk				: in std_logic;
 
-		--! input interface
+		--! 	input interface
+		--! received data for hash calculation
 		Input_data 		: in std_logic_vector(DATA_WIDTH - 1 downto 0);
+		--! length of data counted from the highest bit
 		Input_length 	: in positive range 1 to DATA_WIDTH;
+		--! states is data on output is ready to be read
 		Input_ready 	: in std_logic;
+		--! states if all data was transmited for hash calculation
 		Input_finish 	: in std_logic;
 
-		--! output interface
+		--! 	output interface
+		--! input data merged into 32-bit word
 		Word_output		: out DWORD;
+		--! id of the word in the message block
 		Word_id			: out natural range 0 to 15;
+		--! states if output word is ready to be read
 		Word_ready		: out std_logic;
 
 		Reset			: in std_logic
@@ -29,7 +36,9 @@ end PADDING_MESSAGE;
 
 architecture Behavioral of PADDING_MESSAGE is
 
+	--! types of states for process of PADDING_MESSAGE
 	type STATE_TYPE is (NORMAL, FINISH, STOP);
+	--! determinates the state of the process
 	signal state 	: STATE_TYPE := NORMAL;
 
 	--! buffer used for forming output word

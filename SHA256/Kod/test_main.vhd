@@ -27,13 +27,14 @@ ARCHITECTURE behavior OF test_main IS
 
 	--! file type, constant filename and buffer
 	type BYTE_FILE_TYPE is file of character;
-
+	--! name of the read file
 	constant FILENAME 		: string := "example.bin";
-
+	--! buffer for storing chunks of input file
 	SIGNAL file_buffer		: std_logic_vector(511 downto 0);
 	
 	--! uart transmitter for testing
 	type UART_STATE_TYPE is (IDLE, START, DATA, STOP);
+	--! determinates the state of the uart process
 	SIGNAL state_uart 		: UART_STATE_TYPE := IDLE;
 	--! locks pushing data to uart
 	SIGNAL uart_enable 		: std_logic := '0';
@@ -42,17 +43,11 @@ ARCHITECTURE behavior OF test_main IS
 	--! counts transmitted bits
 	SIGNAL uart_counter		: natural range 0 to DATA_WIDTH+3 := 0;
 
-	--! data received by uart rx from uart_tx
-	SIGNAL TX_Data			: std_logic_vector(DATA_WIDTH-1 downto 0);
-	--! states if TX_Data is ready to read
-	SIGNAL TX_Ready			: std_logic := '0';
-	--! buffer for received tx data (hash)
-	SIGNAL Hash_Tx			: std_logic_vector(255 downto 0) := (others => '0');
-
-	--! flags
+	--! flag which states if file_buffer is full or finished
 	SIGNAL f_full			: std_logic := '0';
+	--! flag which states if all data was sent to MAIN module
 	SIGNAL f_finish			: std_logic := '0';
-	SIGNAL Hash_ready : std_logic; 
+
 BEGIN
 
 	--! main clock signal
@@ -69,8 +64,7 @@ BEGIN
 			Clk_input(0) 		=> Clk,
 			Reset_input(0) 		=> Reset,
 			Rx_input(0)			=> Rx,
-			Tx_output(0)		=> Tx,
-			Hash_ready_out 	=> Hash_ready 
+			Tx_output(0)		=> Tx
 		);
 
 
@@ -98,6 +92,7 @@ BEGIN
 
 		--! states of sending data to tested component
 		type STATE_TYPE is (COMMAND, TRANSMIT, IDLE, STOP);
+		--! determinates the state of testing
 		variable state : STATE_TYPE := IDLE;
 
 		--! buffer which holds ascii commands in binary
@@ -251,31 +246,6 @@ BEGIN
 
 			end if;
 
-		end if;
-
-	END PROCESS;
-
-	--! recieves data from Tx of work.MAIN
-	TX_RECIEVER : ENTITY work.UART_RX
-		GENERIC MAP(
-			CLK_FREQUENCY	=> CLK_FREQUENCY,
-			DATA_WIDTH 		=> DATA_WIDTH,
-			BAUD			=> BAUD
-		)
-		PORT MAP(
-			Clk 			=> Clk,
-			Reset			=> Reset,
-			Rx				=> Tx,
-			RX_Data_Out		=> TX_Data,
-			RX_Ready		=> TX_Ready
-		);
-
-	--! appends received data from TX_RECEIVER and stores in 256-long signal (as a hash)
-	PROCESS(TX_Ready) IS
-	BEGIN
-
-		if rising_edge(TX_Ready) then
-			Hash_Tx <= Hash_Tx(247 downto 0) & TX_Data;
 		end if;
 
 	END PROCESS;
