@@ -27,13 +27,14 @@ ARCHITECTURE behavior OF test_main IS
 
 	--! file type, constant filename and buffer
 	type BYTE_FILE_TYPE is file of character;
-
+	--! name of the read file
 	constant FILENAME 		: string := "example.bin";
-
+	--! buffer for storing chunks of input file
 	SIGNAL file_buffer		: std_logic_vector(511 downto 0);
 	
 	--! uart transmitter for testing
 	type UART_STATE_TYPE is (IDLE, START, DATA, STOP);
+	--! determinates the state of the uart process
 	SIGNAL state_uart 		: UART_STATE_TYPE := IDLE;
 	--! locks pushing data to uart
 	SIGNAL uart_enable 		: std_logic := '0';
@@ -49,9 +50,11 @@ ARCHITECTURE behavior OF test_main IS
 	--! buffer for received tx data (hash)
 	SIGNAL Hash_Tx			: std_logic_vector(255 downto 0) := (others => '0');
 
-	--! flags
+	--! flag which states if file_buffer is full or finished
 	SIGNAL f_full			: std_logic := '0';
+	--! flag which states if all data was sent to MAIN module
 	SIGNAL f_finish			: std_logic := '0';
+	--! temporarly for tests
 	SIGNAL Hash_ready : std_logic; 
 BEGIN
 
@@ -98,6 +101,7 @@ BEGIN
 
 		--! states of sending data to tested component
 		type STATE_TYPE is (COMMAND, TRANSMIT, IDLE, STOP);
+		--! determinates the state of testing
 		variable state : STATE_TYPE := IDLE;
 
 		--! buffer which holds ascii commands in binary

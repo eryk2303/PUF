@@ -9,14 +9,20 @@ entity PREPARE_SCHEDULE is
 	port(
 		Clk 			: in std_logic;
 
-		--! input interface
+		--! 	input interface
+		--! 32-bit input word
 		Word_input		: in DWORD;
+		--! id of the word in the message block
 		Word_in_id		: in natural range 0 to 15;
+		--! states if output word is ready to be read
 		Word_in_ready	: in std_logic;
 
-		--! output interface
+		--! 	output interface
+		--! 32-bit output word
 		Word_output		: out DWORD;
+		--! number of output word (id + 1, 0 means output is not ready)
 		Word_out_nr		: out natural range 0 to 64;
+		--! id of requested word
 		Word_req_id		: in natural range 0 to 63;
 
 		Reset			: in std_logic
@@ -25,7 +31,9 @@ end PREPARE_SCHEDULE;
 
 architecture Behavioral of PREPARE_SCHEDULE is
 
+	--! message schedule with 64 32-bit wordsjak
 	signal schedule : message_schedule;
+	--! acknowledgement which returns number of prepared words in schedule
 	signal ack		: integer := 0;
 
 begin
