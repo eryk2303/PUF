@@ -9,10 +9,14 @@ entity WORD_T is
 	port(
 		Clk 		: in std_logic;
 
-		--! input data
+		--! 	input data
+		--! 32-bit long input word
 		Word_in 	: in DWORD;
+		--! id of the input word
 		Word_id		: in natural range 0 to 15;
+		--! states if word is ready to be read
 		Ready		: in std_logic;
+		--! schedule with all words
 		Schedule 	: inout message_schedule;
 
 		--! counts Ready words, 0 words Ready in Schedule at the beginning
