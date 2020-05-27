@@ -17,7 +17,9 @@ entity main is
 	port(
 		Clk_input 		: in std_logic_vector(0 downto 0);
 		Reset_input 	: in std_logic_vector(0 downto 0);
+		--! RX pin to get signals
 		Rx_input		: in std_logic_vector(0 downto 0);
+		--! Tx pin for transmitting
 		Tx_output		: out std_logic_vector(0 downto 0)
 		
 	);
@@ -27,14 +29,19 @@ architecture Behavioral of main is
 
 	signal Clk			: std_logic;
 	signal Reset		: std_logic;
+	--! signal for get 
 	signal Rx			: std_logic;
+	--! signal for transmitting
 	signal Tx			: std_logic;
 	
+	--! Inputs from uart_rx
 	signal RX_Data 			: std_logic_vector(DATA_WIDTH - 1 downto 0);
+	--! Inputs from uart_rx
 	signal RX_Ready			: std_logic;
 	
 	--! Inputs from uart_tx
 	signal TX_Data : std_logic_vector(7 downto 0);
+	--! Inputs from uart_tx
 	signal TX_Ready : std_logic :=  '0';
 
 	--! Outputs from uart_tx
@@ -42,11 +49,11 @@ architecture Behavioral of main is
 
 begin
 
-	Clk			 <= Clk_input(0);
-	Rx				 <= Rx_input(0);
+	Clk	<= Clk_input(0);
+	Rx	<= Rx_input(0);
 	Tx_output(0) <= Tx;
 	
-
+	--! declaration uart_rx
 	UART_RX : entity work.UART_RX
 		generic map(
 			CLK_FREQUENCY	=> CLK_FREQUENCY,
