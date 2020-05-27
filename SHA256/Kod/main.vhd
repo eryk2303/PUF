@@ -27,9 +27,7 @@ entity MAIN is
 		--! Rx external input
 		Rx_input		: in std_logic_vector(0 downto 0);
 		--! Tx external output
-		Tx_output		: out std_logic_vector(0 downto 0);
-		--! temporarly for tests
-		Hash_ready_out 		:out std_logic
+		Tx_output		: out std_logic_vector(0 downto 0)
 	);
 end MAIN;
 
@@ -76,7 +74,6 @@ begin
 
 	Rx				<= Rx_input(0);
 	Tx_output(0)	<= Tx;
-	Hash_ready_out 	<= Hash_ready;
 
 
 	U1 : entity work.UART_RX
