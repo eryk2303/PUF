@@ -10,21 +10,22 @@ entity COMPUTE_HASH is
 		Clk 				: in std_logic;
 
 		--! 	input interface
-		--! 32-bit inpuy word
+		--! 32-bit input word
 		Word_input 		: in  DWORD;
 		--! number of output word (id + 1, 0 means output is not ready)
 		Word_in_nr	 	: in  natural range 0 to 64;
 		--! id of requested word
 		Word_req_id 	: out natural range 0 to 63;
 		
-		--! states if all data was already transmitted
-		Output_finish	: in std_logic;
+		--! states if all words were already prepared
+		Data_finish		: in std_logic;
 
 		--! 	output interface
 		--! calculated hash on output
 		Hash_output 	: out hash_array;
 		--! states is hash on output is ready to be read
 		Hash_ready		: out std_logic := '0';
+		prehash_ready	: out std_logic := '0';
 
 		Reset 			: in std_logic
 	);
@@ -74,7 +75,8 @@ begin
 					if Word_in_nr = (iter + 1) then
 
 						Hash_ready	<= '0';
-
+						
+						prehash_ready	<=	'0';
 						K := constant_values(iter);
 						W := Word_input;
 						h <= g;
@@ -94,11 +96,12 @@ begin
 				
 				when ADD =>
 						adding(hash, working_vars);
-						if Output_finish = '1' then
+						if Data_finish = '1' then
 							Hash_ready		<= '1';
 						else 
 							Hash_ready		<= '0';
 						end if;
+						prehash_ready	<=	'1';
 						state 			<= INITIALIZE;
 
 				when INITIALIZE =>

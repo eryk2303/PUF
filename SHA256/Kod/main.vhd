@@ -27,7 +27,8 @@ entity MAIN is
 		--! Rx external input
 		Rx_input		: in std_logic_vector(0 downto 0);
 		--! Tx external output
-		Tx_output		: out std_logic_vector(0 downto 0)
+		Tx_output		: out std_logic_vector(0 downto 0);
+		prehash_ready	: out std_logic
 	);
 end MAIN;
 
@@ -60,13 +61,14 @@ architecture Behavioral of MAIN is
 	signal S1_Word_output	: DWORD;
 	signal S1_Word_id		: natural range 0 to 15;
 	signal S1_Word_ready	: std_logic;
+	signal S1_Word_finish 	: std_logic;
 
 	--! signals between PREPARE_SCHEDULE and COMPUTE_HASH
 	signal S2_Word_output	: DWORD;
 	signal S2_Word_out_nr	: natural range 0 to 64;
 	signal S3_Word_req_id	: natural range 0 to 63;
 
-
+	
 begin
 
 	Clk				<= Clk_input(0);
@@ -133,6 +135,7 @@ begin
 			Word_output		=> S1_Word_output,
 			Word_id			=> S1_Word_id,
 			Word_ready		=> S1_Word_ready,
+			Word_finish		=> S1_Word_finish,
 			Reset			=> Reset
 		);
 
@@ -155,9 +158,10 @@ begin
 			Word_input 		=> S2_Word_output,
 			Word_in_nr	 	=> S2_Word_out_nr,
 			Word_req_id 	=> S3_Word_req_id,
-			Output_finish	=> UC_Output_finish,
+			Data_finish		=> S1_Word_finish,
 			Hash_output 	=> Hash,
 			Hash_ready		=> Hash_ready,
+			prehash_ready	=> prehash_ready,
 			Reset 			=> Reset
 		);
 
