@@ -29,6 +29,8 @@ entity PADDING_MESSAGE is
 		Word_id			: out natural range 0 to 15;
 		--! states if output word is ready to be read
 		Word_ready		: out std_logic;
+		--! states if all data was transmited for hash calculation
+		Word_finish 	: inout std_logic := '0';
 
 		Reset			: in std_logic
 	);
@@ -164,12 +166,14 @@ begin
 				when STOP =>
 
 						f_ready 	<= '0';
+						Word_finish <= '1';
 						Word_ready 	<= '0';
 
 			end case;
 
 		elsif Reset = '1' then
 			Word_ready 		<= '0';
+			Word_finish		<= '0';
 			word_counter 	<= 0;
 			bit_counter 	<= (others => '0');
 			f_ready 		<= '0';
