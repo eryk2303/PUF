@@ -43,10 +43,53 @@ ARCHITECTURE behavior OF test_main IS
 	--! counts transmitted bits
 	SIGNAL uart_counter		: natural range 0 to DATA_WIDTH+3 := 0;
 
+	--! data received by uart rx from uart_tx
+	SIGNAL TX_Data			: std_logic_vector(DATA_WIDTH-1 downto 0);
+	--! states if TX_Data is ready to read
+	SIGNAL TX_Ready			: std_logic := '0';
+	--! buffer for received tx data (hash)
+	SIGNAL Hash_Tx			: std_logic_vector(255 downto 0) := (others => '0');
+
 	--! flag which states if file_buffer is full or finished
 	SIGNAL f_full			: std_logic := '0';
 	--! flag which states if all data was sent to MAIN module
 	SIGNAL f_finish			: std_logic := '0';
+
+	
+
+	-- COMPONENT UART_RX is
+	-- 	GENERIC(
+	-- 		CLK_FREQUENCY	: positive;
+	-- 		--! UART message  length
+	-- 		DATA_WIDTH 		: positive;
+	-- 		--! UART baud rate
+	-- 		BAUD			: positive
+	-- 		);
+	-- 	PORT(
+	-- 		Clk					: in std_logic;
+	-- 		Reset				: in std_logic;
+	-- 		--! Rx pin for receiving
+	-- 		Rx					: in std_logic;
+	-- 		--! received data
+	-- 		RX_Data_Out			: out std_logic_vector(DATA_WIDTH - 1 downto 0);
+	-- 		--! determinates if data on output is ready
+	-- 		RX_Ready			: out std_logic
+	-- 	);
+	-- END COMPONENT;
+
+	-- TX_RECIEVER : ENTITY work.UART_RX
+	-- GENERIC MAP(
+	-- 	CLK_FREQUENCY	=> CLK_FREQUENCY,
+	-- 	DATA_WIDTH 		=> DATA_WIDTH,
+	-- 	BAUD			=> BAUD
+	-- )
+	-- PORT MAP(
+	-- 	Clk 			=> Clk,
+	-- 	Reset			=> Reset,
+	-- 	Rx				=> Tx,
+	-- 	RX_Data_Out		=> TX_Data,
+	-- 	RX_Ready		=> TX_Ready
+	-- );
 
 BEGIN
 
@@ -249,5 +292,31 @@ BEGIN
 		end if;
 
 	END PROCESS;
+
+	--! recieves data from Tx of work.MAIN
+	TX_RECIEVER : ENTITY work.UART_RX
+	GENERIC MAP(
+		CLK_FREQUENCY	=> CLK_FREQUENCY,
+		DATA_WIDTH 		=> DATA_WIDTH,
+		BAUD			=> BAUD
+	)
+	PORT MAP(
+		Clk 			=> Clk,
+		Reset			=> Reset,
+		Rx				=> Tx,
+		RX_Data_Out		=> TX_Data,
+		RX_Ready		=> TX_Ready
+	);
+
+	--! appends received data from TX_RECEIVER and stores in 256-long signal (as a hash)
+	PROCESS(TX_Ready) IS
+	BEGIN
+
+		if rising_edge(TX_Ready) then
+			Hash_Tx <= Hash_Tx(247 downto 0) & TX_Data;
+		end if;
+
+	END PROCESS;
+
 
 END;

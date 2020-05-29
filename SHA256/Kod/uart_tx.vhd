@@ -41,7 +41,8 @@ constant MAX_FREQ_COUNT	: positive := CLK_FREQUENCY / BAUD;
 signal freq_count 	: natural range 0 to MAX_FREQ_COUNT - 1;
 --! counting received bits
 signal count 		: natural range 0 to 11 := 11;
-
+--! states if in transmitting mode
+signal transmitting 	: std_logic := '0';
 
 begin
 
@@ -49,14 +50,16 @@ TX_PROCESS: process(Clk, Reset)
 	begin
 		if rising_edge(ClK) then
 			if count = 11 then
+				transmitting <= '0';
 				TX_Start <= '1';
 					if TX_Ready = '1' then
 						TX_Start <= '0';
 						count <=0;
 						freq_count <= 0;
+						transmitting <= '1';
+					end if;
 			end if;
-			end if;
-			if Reset = '0' then
+			if Reset = '0' and transmitting = '1' then
 				if freq_count < (MAX_FREQ_COUNT - 1) then
 					freq_count <= freq_count + 1;
 					if count = 0 then
@@ -79,7 +82,7 @@ TX_PROCESS: process(Clk, Reset)
 						count <= count + 1;
 					end if;
 				end if;
-			else
+			elsif Reset = '1' then
 				TX_Start <= '1';
 				count <= 0;
 				Tx <= '1';
