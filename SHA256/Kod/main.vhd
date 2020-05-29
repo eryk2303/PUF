@@ -27,7 +27,8 @@ entity MAIN is
 		--! Rx external input
 		Rx_input		: in std_logic_vector(0 downto 0);
 		--! Tx external output
-		Tx_output		: out std_logic_vector(0 downto 0)
+		Tx_output		: out std_logic_vector(0 downto 0);
+		prehash_ready	: out std_logic
 	);
 end MAIN;
 
@@ -160,6 +161,7 @@ begin
 			Data_finish		=> S1_Word_finish,
 			Hash_output 	=> Hash,
 			Hash_ready		=> Hash_ready,
+			prehash_ready	=> prehash_ready,
 			Reset 			=> Reset
 		);
 

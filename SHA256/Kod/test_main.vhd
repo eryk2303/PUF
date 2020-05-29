@@ -54,47 +54,13 @@ ARCHITECTURE behavior OF test_main IS
 	SIGNAL f_full			: std_logic := '0';
 	--! flag which states if all data was sent to MAIN module
 	SIGNAL f_finish			: std_logic := '0';
-
 	
-
-	-- COMPONENT UART_RX is
-	-- 	GENERIC(
-	-- 		CLK_FREQUENCY	: positive;
-	-- 		--! UART message  length
-	-- 		DATA_WIDTH 		: positive;
-	-- 		--! UART baud rate
-	-- 		BAUD			: positive
-	-- 		);
-	-- 	PORT(
-	-- 		Clk					: in std_logic;
-	-- 		Reset				: in std_logic;
-	-- 		--! Rx pin for receiving
-	-- 		Rx					: in std_logic;
-	-- 		--! received data
-	-- 		RX_Data_Out			: out std_logic_vector(DATA_WIDTH - 1 downto 0);
-	-- 		--! determinates if data on output is ready
-	-- 		RX_Ready			: out std_logic
-	-- 	);
-	-- END COMPONENT;
-
-	-- TX_RECIEVER : ENTITY work.UART_RX
-	-- GENERIC MAP(
-	-- 	CLK_FREQUENCY	=> CLK_FREQUENCY,
-	-- 	DATA_WIDTH 		=> DATA_WIDTH,
-	-- 	BAUD			=> BAUD
-	-- )
-	-- PORT MAP(
-	-- 	Clk 			=> Clk,
-	-- 	Reset			=> Reset,
-	-- 	Rx				=> Tx,
-	-- 	RX_Data_Out		=> TX_Data,
-	-- 	RX_Ready		=> TX_Ready
-	-- );
+	signal prehash_ready		: std_logic;
 
 BEGIN
 
 	--! main clock signal
-	clock:	Clk <= not Clk after 100 ns;
+	clock:	Clk <= not Clk after 41 ns;
 
 	--! entity of tested component
 	uut: ENTITY work.MAIN
@@ -107,7 +73,8 @@ BEGIN
 			Clk_input(0) 		=> Clk,
 			Reset_input(0) 		=> Reset,
 			Rx_input(0)			=> Rx,
-			Tx_output(0)		=> Tx
+			Tx_output(0)		=> Tx,
+			prehash_ready		=> prehash_ready
 		);
 
 

@@ -25,6 +25,7 @@ entity COMPUTE_HASH is
 		Hash_output 	: out hash_array;
 		--! states is hash on output is ready to be read
 		Hash_ready		: out std_logic := '0';
+		prehash_ready	: out std_logic := '0';
 
 		Reset 			: in std_logic
 	);
@@ -75,6 +76,7 @@ begin
 
 						Hash_ready	<= '0';
 						
+						prehash_ready	<=	'0';
 						K := constant_values(iter);
 						W := Word_input;
 						h <= g;
@@ -99,6 +101,7 @@ begin
 						else 
 							Hash_ready		<= '0';
 						end if;
+						prehash_ready	<=	'1';
 						state 			<= INITIALIZE;
 
 				when INITIALIZE =>
